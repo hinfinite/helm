@@ -23,8 +23,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	dockerauth "github.com/deislabs/oras/pkg/auth/docker"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
-	dockerauth "oras.land/oras-go/pkg/auth/docker"
 
 	"github.com/hinfinite/helm/internal/experimental/registry"
 	"github.com/hinfinite/helm/pkg/chart"
