@@ -29,10 +29,10 @@ import (
 	"github.com/pkg/errors"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/internal/urlutil"
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chart/loader"
-	"github.com/open-hand/helm/pkg/provenance"
+	"github.com/hinfinite/helm/internal/urlutil"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/provenance"
 )
 
 var indexPath = "index.yaml"

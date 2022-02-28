@@ -34,10 +34,10 @@ import (
 	"github.com/pkg/errors"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/chart/loader"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/provenance"
+	"github.com/hinfinite/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/provenance"
 	"github.com/patrickmn/go-cache"
 )
 

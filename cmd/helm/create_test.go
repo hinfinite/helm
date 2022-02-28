@@ -23,11 +23,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/open-hand/helm/internal/test/ensure"
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chart/loader"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/helmpath"
 )
 
 func TestCreateCmd(t *testing.T) {

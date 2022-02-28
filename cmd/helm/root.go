@@ -26,9 +26,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/internal/experimental/registry"
-	"github.com/open-hand/helm/pkg/action"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/pkg/action"
 )
 
 var globalUsage = `The Kubernetes package manager
@@ -140,7 +140,7 @@ func newRootCmd(actionConfig *action.Configuration, out io.Writer, args []string
 		newCreateCmd(out),
 		newDependencyCmd(out),
 		newPullCmd(out),
-		newShowCmd(actionConfig,out),
+		newShowCmd(actionConfig, out),
 		newLintCmd(out),
 		newPackageCmd(out),
 		newRepoCmd(out),

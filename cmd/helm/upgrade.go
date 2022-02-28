@@ -24,14 +24,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/chart/loader"
-	"github.com/open-hand/helm/pkg/cli/output"
-	"github.com/open-hand/helm/pkg/cli/values"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/cli/output"
+	"github.com/hinfinite/helm/pkg/cli/values"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/storage/driver"
 )
 
 const upgradeDesc = `
@@ -62,7 +62,7 @@ set for a key called 'foo', the 'newbar' value would take precedence:
 `
 
 func newUpgradeCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
-	client := action.NewUpgrade(cfg, action.ChartPathOptions{}, "", 0, "",nil, "", "", "", 0, "", "",false)
+	client := action.NewUpgrade(cfg, action.ChartPathOptions{}, "", 0, "", nil, "", "", "", 0, "", "", false)
 	valueOpts := &values.Options{}
 	var outfmt output.Format
 	var createNamespace bool
@@ -99,7 +99,7 @@ func newUpgradeCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 					if outfmt == output.Table {
 						fmt.Fprintf(out, "Release %q does not exist. Installing it now.\n", args[0])
 					}
-					instClient := action.NewInstall(cfg, action.ChartPathOptions{}, "", 0, "",nil, "", "", "", "", 0, "", "", "",false)
+					instClient := action.NewInstall(cfg, action.ChartPathOptions{}, "", 0, "", nil, "", "", "", "", 0, "", "", "", false)
 					instClient.CreateNamespace = createNamespace
 					instClient.ChartPathOptions = client.ChartPathOptions
 					instClient.DryRun = client.DryRun

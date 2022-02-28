@@ -25,7 +25,7 @@ import (
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 const pluginFileName = "plugin.yaml"

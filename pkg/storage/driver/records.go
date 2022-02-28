@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strconv"
 
-	rspb "github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 // records holds a list of in-memory release records

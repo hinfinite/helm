@@ -18,14 +18,15 @@ package action
 
 import (
 	"fmt"
-	"github.com/open-hand/helm/pkg/release"
 	"strings"
+
+	"github.com/hinfinite/helm/pkg/release"
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chart/loader"
-	"github.com/open-hand/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/chartutil"
 )
 
 // ShowOutputFormat is the format of the output of `helm show`
@@ -54,8 +55,8 @@ func (o ShowOutputFormat) String() string {
 //
 // It provides the implementation of 'helm show' and its respective subcommands.
 type Show struct {
-	cfg          *Configuration
-	Namespace    string
+	cfg       *Configuration
+	Namespace string
 	ChartPathOptions
 	Devel        bool
 	OutputFormat ShowOutputFormat

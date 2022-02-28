@@ -20,7 +20,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 func TestValidateAgainstSingleSchema(t *testing.T) {

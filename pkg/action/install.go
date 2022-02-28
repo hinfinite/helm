@@ -19,8 +19,6 @@ package action
 import (
 	"bytes"
 	"fmt"
-	"github.com/Masterminds/sprig/v3"
-	"github.com/open-hand/helm/pkg/agent/action"
 	"io/ioutil"
 	"os"
 	"path"
@@ -29,6 +27,9 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/Masterminds/sprig/v3"
+	"github.com/hinfinite/helm/pkg/agent/action"
+
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -36,20 +37,20 @@ import (
 	"k8s.io/cli-runtime/pkg/resource"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/downloader"
-	"github.com/open-hand/helm/pkg/engine"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/kube"
-	kubefake "github.com/open-hand/helm/pkg/kube/fake"
-	"github.com/open-hand/helm/pkg/postrender"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/releaseutil"
-	"github.com/open-hand/helm/pkg/repo"
-	"github.com/open-hand/helm/pkg/storage"
-	"github.com/open-hand/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/downloader"
+	"github.com/hinfinite/helm/pkg/engine"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/kube"
+	kubefake "github.com/hinfinite/helm/pkg/kube/fake"
+	"github.com/hinfinite/helm/pkg/postrender"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/releaseutil"
+	"github.com/hinfinite/helm/pkg/repo"
+	"github.com/hinfinite/helm/pkg/storage"
+	"github.com/hinfinite/helm/pkg/storage/driver"
 )
 
 // releaseNameMaxLen is the maximum length of a release name.

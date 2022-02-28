@@ -23,11 +23,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/cli/output"
-	"github.com/open-hand/helm/pkg/cli/values"
-	"github.com/open-hand/helm/pkg/postrender"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/cli/output"
+	"github.com/hinfinite/helm/pkg/cli/values"
+	"github.com/hinfinite/helm/pkg/postrender"
 )
 
 const outputFlag = "output"

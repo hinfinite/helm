@@ -21,7 +21,7 @@ import (
 	"strings"
 	"sync"
 
-	rspb"github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 var _ Driver = (*Memory)(nil)

@@ -31,9 +31,9 @@ import (
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 type repoAddOptions struct {

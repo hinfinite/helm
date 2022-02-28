@@ -26,8 +26,8 @@ import (
 	"github.com/pkg/errors"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/release"
 )
 
 // Manifest represents a manifest file, which has a name and some content.

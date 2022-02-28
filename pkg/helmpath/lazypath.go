@@ -17,7 +17,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/open-hand/helm/pkg/helmpath/xdg"
+	"github.com/hinfinite/helm/pkg/helmpath/xdg"
 )
 
 // lazypath is an lazy-loaded path buffer for the XDG base directory specification.

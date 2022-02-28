@@ -19,8 +19,8 @@ package release
 import (
 	"math/rand"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/time"
 )
 
 // MockHookTemplate is the hook template used for all mock release objects.

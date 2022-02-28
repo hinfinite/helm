@@ -29,15 +29,15 @@ import (
 	"testing"
 	"time"
 
-	auth "github.com/deislabs/oras/pkg/auth/docker"
 	"github.com/docker/distribution/configuration"
 	"github.com/docker/distribution/registry"
 	_ "github.com/docker/distribution/registry/auth/htpasswd"
 	_ "github.com/docker/distribution/registry/storage/driver/inmemory"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
+	auth "oras.land/oras-go/pkg/auth/docker"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 var (

@@ -27,10 +27,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/plugin/cache"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/plugin/cache"
 )
 
 // HTTPInstaller installs plugins from an archive served by a web server.

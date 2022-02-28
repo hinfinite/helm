@@ -26,7 +26,7 @@ import (
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 // NewTempServer creates a server inside of a temp dir.

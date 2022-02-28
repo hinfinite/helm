@@ -20,8 +20,8 @@ import (
 	"path"
 	"regexp"
 
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/releaseutil"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/releaseutil"
 )
 
 // ListStates represents zero or more status codes that a list item may have set

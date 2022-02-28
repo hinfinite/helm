@@ -21,9 +21,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/open-hand/helm/internal/test/ensure"
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/helmpath/xdg"
+	"github.com/hinfinite/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/helmpath/xdg"
 )
 
 func TestRootCmd(t *testing.T) {

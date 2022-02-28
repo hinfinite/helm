@@ -20,8 +20,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 func TestSortScore(t *testing.T) {

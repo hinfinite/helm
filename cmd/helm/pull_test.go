@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/repo/repotest"
+	"github.com/hinfinite/helm/pkg/repo/repotest"
 )
 
 func TestPullCmd(t *testing.T) {

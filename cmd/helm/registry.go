@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/action"
 )
 
 const registryHelp = `

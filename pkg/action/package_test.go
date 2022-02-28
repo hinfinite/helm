@@ -19,7 +19,7 @@ package action
 import (
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 func TestSetVersion(t *testing.T) {

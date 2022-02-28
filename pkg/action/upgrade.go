@@ -20,21 +20,22 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/open-hand/helm/pkg/agent/action"
-	v1 "k8s.io/api/core/v1"
 	"strings"
 	"time"
+
+	"github.com/hinfinite/helm/pkg/agent/action"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/resource"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/kube"
-	"github.com/open-hand/helm/pkg/postrender"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/releaseutil"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/kube"
+	"github.com/hinfinite/helm/pkg/postrender"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/releaseutil"
 )
 
 // Upgrade is the action for upgrading releases.

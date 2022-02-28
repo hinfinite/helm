@@ -28,15 +28,15 @@ import (
 	shellwords "github.com/mattn/go-shellwords"
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/internal/test"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/cli"
-	kubefake "github.com/open-hand/helm/pkg/kube/fake"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/storage"
-	"github.com/open-hand/helm/pkg/storage/driver"
-	"github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/internal/test"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/cli"
+	kubefake "github.com/hinfinite/helm/pkg/kube/fake"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/storage"
+	"github.com/hinfinite/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/pkg/time"
 )
 
 func testTimestamper() time.Time { return time.Unix(242085845, 0).UTC() }

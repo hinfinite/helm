@@ -21,8 +21,8 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/open-hand/helm/internal/experimental/registry"
-	"github.com/open-hand/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/pkg/chartutil"
 )
 
 // ChartExport performs a chart export operation.

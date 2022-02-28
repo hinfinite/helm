@@ -22,8 +22,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chartutil"
 )
 
 func TestSortTemplates(t *testing.T) {

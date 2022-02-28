@@ -19,9 +19,9 @@ package main
 import (
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/time"
 )
 
 func TestListCmd(t *testing.T) {

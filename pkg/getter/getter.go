@@ -21,7 +21,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 // options are generic parameters to be provided to the getter during instantiation.

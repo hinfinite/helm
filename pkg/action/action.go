@@ -27,13 +27,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/open-hand/helm/internal/experimental/registry"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/kube"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/storage"
-	"github.com/open-hand/helm/pkg/storage/driver"
-	"github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/kube"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/storage"
+	"github.com/hinfinite/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/pkg/time"
 )
 
 // Timestamper is a function capable of producing a timestamp.Timestamper.

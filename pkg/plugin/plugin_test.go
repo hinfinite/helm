@@ -22,7 +22,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 func checkCommand(p *Plugin, extraArgs []string, osStrCmp string, t *testing.T) {

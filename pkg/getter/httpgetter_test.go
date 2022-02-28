@@ -26,9 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/internal/tlsutil"
-	"github.com/open-hand/helm/internal/version"
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/internal/tlsutil"
+	"github.com/hinfinite/helm/internal/version"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 func TestHTTPGetter(t *testing.T) {

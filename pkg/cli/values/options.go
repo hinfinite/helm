@@ -20,13 +20,14 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"sigs.k8s.io/yaml"
 	"strings"
+
+	"sigs.k8s.io/yaml"
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/strvals"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/strvals"
 )
 
 type Options struct {

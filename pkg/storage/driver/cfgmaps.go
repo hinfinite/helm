@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
-	rspb "github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 var _ Driver = (*ConfigMaps)(nil)

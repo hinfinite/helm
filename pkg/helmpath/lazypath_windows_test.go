@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build windows
 // +build windows
 
 package helmpath
@@ -22,7 +23,7 @@ import (
 
 	"k8s.io/client-go/util/homedir"
 
-	"github.com/open-hand/helm/pkg/helmpath/xdg"
+	"github.com/hinfinite/helm/pkg/helmpath/xdg"
 )
 
 const (

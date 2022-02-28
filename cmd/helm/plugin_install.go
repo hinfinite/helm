@@ -21,9 +21,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/pkg/plugin"
-	"github.com/open-hand/helm/pkg/plugin/installer"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/pkg/plugin"
+	"github.com/hinfinite/helm/pkg/plugin/installer"
 )
 
 type pluginInstallOptions struct {

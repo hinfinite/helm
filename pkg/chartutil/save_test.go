@@ -30,8 +30,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chart/loader"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart/loader"
 )
 
 func TestSave(t *testing.T) {

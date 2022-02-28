@@ -23,8 +23,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/internal/version"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/internal/version"
 )
 
 const versionDesc = `

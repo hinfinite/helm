@@ -24,9 +24,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/pkg/cli/output"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/pkg/cli/output"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 func newRepoListCmd(out io.Writer) *cobra.Command {

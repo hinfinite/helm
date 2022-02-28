@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/lint/support"
+	"github.com/hinfinite/helm/pkg/lint/support"
 )
 
 const templateTestBasedir = "./testdata/albatross"

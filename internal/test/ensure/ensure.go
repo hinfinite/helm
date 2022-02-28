@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/helmpath/xdg"
+	"github.com/hinfinite/helm/pkg/helmpath/xdg"
 )
 
 // HelmHome sets up a Helm Home in a temp dir.

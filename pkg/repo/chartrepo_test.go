@@ -30,10 +30,10 @@ import (
 
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/internal/test/ensure"
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/getter"
+	"github.com/hinfinite/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/getter"
 )
 
 const (

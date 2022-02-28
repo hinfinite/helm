@@ -17,7 +17,7 @@ limitations under the License.
 package action
 
 import (
-	"github.com/open-hand/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/release"
 )
 
 // Get is the action for checking a given release's information.

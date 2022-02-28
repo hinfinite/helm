@@ -17,7 +17,7 @@ limitations under the License.
 package action
 
 import (
-	"github.com/open-hand/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/release"
 )
 
 // Status is the action for checking the deployment status of releases.

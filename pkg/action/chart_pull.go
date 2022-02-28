@@ -19,7 +19,7 @@ package action
 import (
 	"io"
 
-	"github.com/open-hand/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/internal/experimental/registry"
 )
 
 // ChartPull performs a chart pull operation.

@@ -22,9 +22,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/releaseutil"
-	helmtime "github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/releaseutil"
+	helmtime "github.com/hinfinite/helm/pkg/time"
 )
 
 // Uninstall is the action for uninstalling releases.

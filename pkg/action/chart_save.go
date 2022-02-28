@@ -19,8 +19,8 @@ package action
 import (
 	"io"
 
-	"github.com/open-hand/helm/internal/experimental/registry"
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 // ChartSave performs a chart save operation.

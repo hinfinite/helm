@@ -23,10 +23,10 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/util/homedir"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/downloader"
-	"github.com/open-hand/helm/pkg/getter"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/downloader"
+	"github.com/hinfinite/helm/pkg/getter"
 )
 
 const dependencyBuildDesc = `

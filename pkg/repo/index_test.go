@@ -27,11 +27,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/helmpath"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 const (

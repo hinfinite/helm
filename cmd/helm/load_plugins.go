@@ -32,8 +32,8 @@ import (
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/plugin"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/plugin"
 )
 
 const (

@@ -2,15 +2,16 @@ package action
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/golang/glog"
-	"github.com/open-hand/helm/pkg/agent/model"
-	"k8s.io/api/core/v1"
+	"github.com/hinfinite/helm/pkg/agent/model"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/kubernetes"
-	"strconv"
 )
 
 func AddLabel(imagePullSecret []v1.LocalObjectReference,
@@ -42,11 +43,13 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		l[model.AppVersionLabel] = version
 	}
 
-	var addTemplateAppLabels = func() {
+	var addTemplateAppLabels = func(workloadKind, workloadName string) {
 		tplLabels := getTemplateLabels(t.Object)
 		tplLabels[model.ReleaseLabel] = releaseName
 		tplLabels[model.AgentVersionLabel] = agentVersion
 		tplLabels[model.CommitLabel] = commit
+		tplLabels[model.ParentWorkloadLabel] = workloadKind
+		tplLabels[model.ParentWorkloadNameLabel] = workloadName
 		//12.05 新增打标签。
 		//0 表示的是安装未填入值 -1代表更新
 		if (appServiceId != 0 && appServiceId != -1) || (V1AppServiceId != "0" && V1AppServiceId != "-1") {
@@ -103,7 +106,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
 		addAppLabels()
-		addTemplateAppLabels()
+		addTemplateAppLabels(kind, t.GetName())
 		addSelectorAppLabels()
 		addImagePullSecrets()
 		if isUpgrade {
@@ -154,12 +157,22 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			tplLabels[model.ReleaseLabel] = releaseName
 		}
 		tplLabels[model.CommitLabel] = commit
+		tplLabels[model.ParentWorkloadLabel] = kind
+		tplLabels[model.ParentWorkloadNameLabel] = t.GetName()
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
 			glog.Warningf("Set Test-Template Labels failed, %v", err)
 		}
+	case "CronJob":
+		tplLabels := getTemplateLabels(t.Object)
+		tplLabels[model.CommitLabel] = commit
+		tplLabels[model.ParentWorkloadLabel] = kind
+		tplLabels[model.ParentWorkloadNameLabel] = t.GetName()
+		if err := setCronJobPodTemplateLabels(t.Object, tplLabels); err != nil {
+			glog.Warningf("Set Template Labels failed, %v", err)
+		}
 	case "DaemonSet", "StatefulSet":
 		addAppLabels()
-		addTemplateAppLabels()
+		addTemplateAppLabels(kind, t.GetName())
 		addImagePullSecrets()
 		if isUpgrade {
 			if kind == "StatefulSet" {
@@ -193,6 +206,10 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	addBaseLabels()
 	t.SetLabels(l)
 	return nil
+}
+
+func setCronJobPodTemplateLabels(obj map[string]interface{}, templateLabels map[string]string) error {
+	return unstructured.SetNestedStringMap(obj, templateLabels, "spec", "jobTemplate", "spec", "template", "metadata", "labels")
 }
 
 func setTemplateLabels(obj map[string]interface{}, templateLabels map[string]string) error {

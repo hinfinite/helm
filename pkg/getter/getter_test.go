@@ -18,7 +18,7 @@ package getter
 import (
 	"testing"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 const pluginDir = "testdata/plugins"

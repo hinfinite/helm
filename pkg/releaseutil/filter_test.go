@@ -19,7 +19,7 @@ package releaseutil // import "helm.sh/helm/v3/pkg/releaseutil"
 import (
 	"testing"
 
-	rspb "github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 func TestFilterAny(t *testing.T) {

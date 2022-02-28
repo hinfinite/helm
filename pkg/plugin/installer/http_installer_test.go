@@ -28,9 +28,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/internal/test/ensure"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/helmpath"
 )
 
 var _ Installer = new(HTTPInstaller)

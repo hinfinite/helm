@@ -21,7 +21,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	rspb "github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 func TestConfigMapName(t *testing.T) {

@@ -21,11 +21,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/open-hand/helm/internal/test/ensure"
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/repo"
-	"github.com/open-hand/helm/pkg/repo/repotest"
+	"github.com/hinfinite/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/repo"
+	"github.com/hinfinite/helm/pkg/repo/repotest"
 )
 
 const (

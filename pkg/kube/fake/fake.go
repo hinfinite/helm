@@ -24,7 +24,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/cli-runtime/pkg/resource"
 
-	"github.com/open-hand/helm/pkg/kube"
+	"github.com/hinfinite/helm/pkg/kube"
 )
 
 // FailingKubeClient implements KubeClient for testing purposes. It also has

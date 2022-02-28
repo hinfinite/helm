@@ -25,11 +25,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/downloader"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/downloader"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 // Pull is the action for checking a given release's information.

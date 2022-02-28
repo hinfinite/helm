@@ -18,7 +18,7 @@ package resolver
 import (
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 func TestResolve(t *testing.T) {

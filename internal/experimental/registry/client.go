@@ -24,14 +24,14 @@ import (
 	"net/http"
 	"sort"
 
-	auth "github.com/deislabs/oras/pkg/auth/docker"
-	"github.com/deislabs/oras/pkg/oras"
 	"github.com/gosuri/uitable"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
+	auth "oras.land/oras-go/pkg/auth/docker"
+	"oras.land/oras-go/pkg/oras"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/helmpath"
 )
 
 const (

@@ -26,12 +26,12 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/cli/values"
-	"github.com/open-hand/helm/pkg/releaseutil"
+	"github.com/hinfinite/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/cli/values"
+	"github.com/hinfinite/helm/pkg/releaseutil"
 )
 
 const templateDesc = `

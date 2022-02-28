@@ -23,9 +23,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/internal/tlsutil"
-	"github.com/open-hand/helm/internal/urlutil"
-	"github.com/open-hand/helm/internal/version"
+	"github.com/hinfinite/helm/internal/tlsutil"
+	"github.com/hinfinite/helm/internal/urlutil"
+	"github.com/hinfinite/helm/internal/version"
 )
 
 // HTTPGetter is the default HTTP(/S) backend handler

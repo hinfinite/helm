@@ -1,6 +1,8 @@
 package model
 
 const (
+	ParentWorkloadNameLabel = "choerodon.io/parent-workload-name"
+	ParentWorkloadLabel     = "choerodon.io/parent-workload"
 	AppLabel          = "choerodon.io/application"
 	AppVersionLabel   = "choerodon.io/version"
 	ReleaseLabel      = "choerodon.io/release"

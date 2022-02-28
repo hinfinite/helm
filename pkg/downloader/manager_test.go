@@ -21,10 +21,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chartutil"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/repo/repotest"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/repo/repotest"
 )
 
 func TestVersionEquals(t *testing.T) {

@@ -22,7 +22,7 @@ import (
 	"testing"
 	"text/template"
 
-	"github.com/open-hand/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart"
 )
 
 func TestReadValues(t *testing.T) {

@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 )
 
 func TestCollectPlugins(t *testing.T) {

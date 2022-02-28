@@ -17,15 +17,16 @@ package action
 
 import (
 	"bytes"
-	"github.com/open-hand/helm/pkg/agent/action"
-	v1 "k8s.io/api/core/v1"
 	"sort"
 	"time"
 
+	"github.com/hinfinite/helm/pkg/agent/action"
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/release"
-	helmtime "github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/pkg/release"
+	helmtime "github.com/hinfinite/helm/pkg/time"
 )
 
 // execHook executes all of the hooks for the given hook event.

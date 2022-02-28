@@ -31,11 +31,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/search"
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/cli/output"
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/cmd/helm/search"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/cli/output"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 const searchRepoDesc = `

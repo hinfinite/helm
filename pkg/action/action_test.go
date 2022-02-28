@@ -23,17 +23,17 @@ import (
 	"path/filepath"
 	"testing"
 
-	dockerauth "github.com/deislabs/oras/pkg/auth/docker"
 	fakeclientset "k8s.io/client-go/kubernetes/fake"
+	dockerauth "oras.land/oras-go/pkg/auth/docker"
 
-	"github.com/open-hand/helm/internal/experimental/registry"
-	"github.com/open-hand/helm/pkg/chart"
-	"github.com/open-hand/helm/pkg/chartutil"
-	kubefake "github.com/open-hand/helm/pkg/kube/fake"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/storage"
-	"github.com/open-hand/helm/pkg/storage/driver"
-	"github.com/open-hand/helm/pkg/time"
+	"github.com/hinfinite/helm/internal/experimental/registry"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chartutil"
+	kubefake "github.com/hinfinite/helm/pkg/kube/fake"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/storage"
+	"github.com/hinfinite/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/pkg/time"
 )
 
 var verbose = flag.Bool("test.log", false, "enable test logging")

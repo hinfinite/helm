@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/resource"
 
-	"github.com/open-hand/helm/pkg/kube"
+	"github.com/hinfinite/helm/pkg/kube"
 )
 
 var accessor = meta.NewAccessor()

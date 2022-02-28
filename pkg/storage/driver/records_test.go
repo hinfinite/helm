@@ -20,7 +20,7 @@ import (
 	"reflect"
 	"testing"
 
-	rspb "github.com/open-hand/helm/pkg/release"
+	rspb "github.com/hinfinite/helm/pkg/release"
 )
 
 func TestRecordsAdd(t *testing.T) {

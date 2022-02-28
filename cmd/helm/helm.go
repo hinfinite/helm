@@ -32,13 +32,13 @@ import (
 	// Import to initialize client auth plugins.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/open-hand/helm/internal/completion"
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/cli"
-	"github.com/open-hand/helm/pkg/gates"
-	kubefake "github.com/open-hand/helm/pkg/kube/fake"
-	"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/storage/driver"
+	"github.com/hinfinite/helm/internal/completion"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/gates"
+	kubefake "github.com/hinfinite/helm/pkg/kube/fake"
+	"github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/storage/driver"
 )
 
 // FeatureGateOCI is the feature gate for checking if `helm chart` and `helm registry` commands should work

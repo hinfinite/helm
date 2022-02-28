@@ -21,8 +21,8 @@ import (
 	"reflect"
 	"testing"
 
-	rspb"github.com/open-hand/helm/pkg/release"
-	"github.com/open-hand/helm/pkg/storage/driver"
+	rspb "github.com/hinfinite/helm/pkg/release"
+	"github.com/hinfinite/helm/pkg/storage/driver"
 )
 
 func TestStorageCreate(t *testing.T) {

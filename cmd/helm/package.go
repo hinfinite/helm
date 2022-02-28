@@ -26,10 +26,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/pkg/action"
-	"github.com/open-hand/helm/pkg/cli/values"
-	"github.com/open-hand/helm/pkg/downloader"
-	"github.com/open-hand/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/cli/values"
+	"github.com/hinfinite/helm/pkg/downloader"
+	"github.com/hinfinite/helm/pkg/getter"
 )
 
 const packageDesc = `

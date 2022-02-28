@@ -26,11 +26,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/internal/urlutil"
-	"github.com/open-hand/helm/pkg/getter"
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/provenance"
-	"github.com/open-hand/helm/pkg/repo"
+	"github.com/hinfinite/helm/internal/urlutil"
+	"github.com/hinfinite/helm/pkg/getter"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/provenance"
+	"github.com/hinfinite/helm/pkg/repo"
 )
 
 // VerificationStrategy describes a strategy for determining whether to verify a chart.

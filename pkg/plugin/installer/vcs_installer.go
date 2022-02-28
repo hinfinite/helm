@@ -23,8 +23,8 @@ import (
 	"github.com/Masterminds/vcs"
 	"github.com/pkg/errors"
 
-	"github.com/open-hand/helm/pkg/helmpath"
-	"github.com/open-hand/helm/pkg/plugin/cache"
+	"github.com/hinfinite/helm/pkg/helmpath"
+	"github.com/hinfinite/helm/pkg/plugin/cache"
 )
 
 // VCSInstaller installs plugins from remote a repository.

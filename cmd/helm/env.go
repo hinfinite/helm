@@ -21,11 +21,11 @@ import (
 	"io"
 	"sort"
 
-	"github.com/open-hand/helm/pkg/cli"
+	"github.com/hinfinite/helm/pkg/cli"
 
 	"github.com/spf13/cobra"
 
-	"github.com/open-hand/helm/cmd/helm/require"
+	"github.com/hinfinite/helm/cmd/helm/require"
 )
 
 var (

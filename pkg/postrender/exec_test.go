@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/open-hand/helm/internal/test/ensure"
+	"github.com/hinfinite/helm/internal/test/ensure"
 )
 
 const testingScript = `#!/bin/sh
