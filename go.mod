@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Masterminds/vcs v1.13.1
 	github.com/Microsoft/go-winio v0.5.1 // indirect
-	github.com/Microsoft/hcsshim v0.9.1 // indirect
+	// github.com/Microsoft/hcsshim v0.9.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.0 // indirect
 	github.com/containerd/cgroups v1.0.2 // indirect
