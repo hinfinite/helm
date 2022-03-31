@@ -27,6 +27,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/hinfinite/helm/internal/urlutil"
+	"github.com/hinfinite/helm/pkg/chart"
+	"github.com/hinfinite/helm/pkg/chart/loader"
 	"github.com/hinfinite/helm/pkg/getter"
 	"github.com/hinfinite/helm/pkg/helmpath"
 	"github.com/hinfinite/helm/pkg/provenance"
@@ -391,4 +393,38 @@ func loadRepoConfig(file string) (*repo.File, error) {
 		return nil, err
 	}
 	return r, nil
+}
+
+// DownloadToChart retrieves a chart. Depending on the settings, it may also download a provenance file.
+//
+// If Verify is set to VerifyNever, the verification will be nil.
+// If Verify is set to VerifyIfPossible, this will return a verification (or nil on failure), and print a warning on failure.
+// If Verify is set to VerifyAlways, this will return a verification or an error if the verification fails.
+// If Verify is set to VerifyLater, this will download the prov file (if it exists), but not verify it.
+//
+// For VerifyNever and VerifyIfPossible, the Verification may be empty.
+//
+// Returns a string path to the location where the file was downloaded and a verification
+// (if provenance was verified), or an error if something bad happened.
+// @date: 2022-03-30
+// @author: allen
+func (c *ChartDownloader) DownloadToChart(ref string, version string) (*chart.Chart, error) {
+	u, err := c.ResolveChartVersion(ref, version)
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := c.Getters.ByScheme(u.Scheme)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := g.Get(u.String(), c.Options...)
+	if err != nil {
+		return nil, err
+	}
+
+	sc, err := loader.LoadArchive(data)
+
+	return sc, err
 }
