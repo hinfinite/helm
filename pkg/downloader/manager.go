@@ -720,3 +720,61 @@ func move(tmpPath, destPath string) error {
 	}
 	return nil
 }
+
+// DownloadAllChart takes a list of dependencies and downloads them into charts/
+//
+// It will delete versions of the chart that exist on disk and might cause
+// a conflict.
+// @date: 2022-03-30
+// @author: allen
+func (m *Manager) DownloadAllChart(deps []*chart.Dependency) ([]*chart.Chart, error) {
+	repos, err := m.loadChartRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Fprintf(m.Out, "Saving %d charts\n", len(deps))
+
+	scList := make([]*chart.Chart, 0)
+	for _, dep := range deps {
+		// No repository means the chart is in charts directory
+		if dep.Repository == "" {
+			// No Action
+			continue
+		}
+		if strings.HasPrefix(dep.Repository, "file://") {
+			// No Action
+			continue
+		}
+
+		fmt.Fprintf(m.Out, "Downloading %s from repo %s\n", dep.Name, dep.Repository)
+
+		// Any failure to resolve/download a chart should fail:
+		// https://github.com/helm/helm/issues/1439
+		churl, username, password, err := m.findChartURL(dep.Name, dep.Version, dep.Repository, repos)
+		if err != nil {
+			return nil, err
+		}
+
+		dl := ChartDownloader{
+			Out:              m.Out,
+			Verify:           m.Verify,
+			Keyring:          m.Keyring,
+			RepositoryConfig: m.RepositoryConfig,
+			RepositoryCache:  m.RepositoryCache,
+			Getters:          m.Getters,
+			Options: []getter.Option{
+				getter.WithBasicAuth(username, password),
+			},
+		}
+
+		sc, err := dl.DownloadToChart(churl, "")
+		if err != nil {
+			return nil, errors.Wrapf(err, "could not download %s", churl)
+		}
+
+		scList = append(scList, sc)
+	}
+
+	return scList, nil
+}
