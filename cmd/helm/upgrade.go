@@ -30,6 +30,7 @@ import (
 	"github.com/hinfinite/helm/pkg/chart/loader"
 	"github.com/hinfinite/helm/pkg/cli/output"
 	"github.com/hinfinite/helm/pkg/cli/values"
+	"github.com/hinfinite/helm/pkg/downloader"
 	"github.com/hinfinite/helm/pkg/getter"
 	"github.com/hinfinite/helm/pkg/storage/driver"
 )
@@ -129,8 +130,34 @@ func newUpgradeCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 				return err
 			}
 			if req := ch.Metadata.Dependencies; req != nil {
+
+				// first download dependencies @2022-03-30 by allen
+				p := getter.All(settings)
+				man := &downloader.Manager{
+					Out:              out,
+					ChartPath:        chartPath,
+					Keyring:          client.ChartPathOptions.Keyring,
+					SkipUpdate:       false,
+					Getters:          p,
+					RepositoryConfig: settings.RepositoryConfig,
+					RepositoryCache:  settings.RepositoryCache,
+				}
+
+				depChartList, err := man.DownloadAllChart(req)
+				if err == nil {
+					ch.AddDependency(depChartList...)
+				}
+				// end of first download dependencies @2022-03-30
+
 				if err := action.CheckDependencies(ch, req); err != nil {
-					return err
+
+					// first download dependencies @2022-03-30 by allen
+					// return err
+					if err := man.Update(); err != nil {
+						return err
+					}
+					// end of first download dependencies @2022-03-30
+
 				}
 			}
 
