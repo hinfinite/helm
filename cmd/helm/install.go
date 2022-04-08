@@ -197,20 +197,38 @@ func runInstall(args []string, client *action.Install, valueOpts *values.Options
 	}
 
 	if req := chartRequested.Metadata.Dependencies; req != nil {
+
+		// first download dependencies @2022-03-30 by allen
+		man := &downloader.Manager{
+			Out:              out,
+			ChartPath:        cp,
+			Keyring:          client.ChartPathOptions.Keyring,
+			SkipUpdate:       false,
+			Getters:          p,
+			RepositoryConfig: settings.RepositoryConfig,
+			RepositoryCache:  settings.RepositoryCache,
+		}
+
+		depChartList, err := man.DownloadAllChart(req)
+		if err == nil {
+			chartRequested.AddDependency(depChartList...)
+		}
+		// end of first download dependencies @2022-03-30
+
 		// If CheckDependencies returns an error, we have unfulfilled dependencies.
 		// As of Helm 2.4.0, this is treated as a stopping condition:
 		// https://github.com/helm/helm/issues/2209
 		if err := action.CheckDependencies(chartRequested, req); err != nil {
 			if client.DependencyUpdate {
-				man := &downloader.Manager{
-					Out:              out,
-					ChartPath:        cp,
-					Keyring:          client.ChartPathOptions.Keyring,
-					SkipUpdate:       false,
-					Getters:          p,
-					RepositoryConfig: settings.RepositoryConfig,
-					RepositoryCache:  settings.RepositoryCache,
-				}
+				// man := &downloader.Manager{
+				// 	Out:              out,
+				// 	ChartPath:        cp,
+				// 	Keyring:          client.ChartPathOptions.Keyring,
+				// 	SkipUpdate:       false,
+				// 	Getters:          p,
+				// 	RepositoryConfig: settings.RepositoryConfig,
+				// 	RepositoryCache:  settings.RepositoryCache,
+				// }
 				if err := man.Update(); err != nil {
 					return nil, err
 				}

@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Masterminds/vcs v1.13.1
 	github.com/Microsoft/go-winio v0.5.1 // indirect
-	github.com/Microsoft/hcsshim v0.9.1 // indirect
+	// github.com/Microsoft/hcsshim v0.9.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/bshuster-repo/logrus-logstash-hook v1.0.0 // indirect
 	github.com/containerd/cgroups v1.0.2 // indirect
@@ -45,13 +45,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/xeipuuv/gojsonschema v1.1.0
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
-	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220107163113-42d7afdf6368 // indirect
-	google.golang.org/grpc v1.43.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gotest.tools/v3 v3.0.2 // indirect
+	gotest.tools/v3 v3.1.0 // indirect
 	helm.sh/helm/v3 v3.1.2
 	k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver v0.17.3
