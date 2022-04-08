@@ -32,7 +32,7 @@ import (
 
 func upgradeAction(t *testing.T) *Upgrade {
 	config := actionConfigFixture(t)
-	upAction := NewUpgrade(config, ChartPathOptions{}, "", 0, nil, "", "", "", 0, "", false)
+	upAction := NewUpgrade(config, ChartPathOptions{}, "", nil, "", "", "", "", "", false)
 	upAction.Namespace = "spaced"
 
 	return upAction

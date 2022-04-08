@@ -44,7 +44,7 @@ type nameTemplateTestCase struct {
 
 func installAction(t *testing.T) *Install {
 	config := actionConfigFixture(t)
-	instAction := NewInstall(config, ChartPathOptions{}, 0, nil, "", "", "", "", 0, "", "", false)
+	instAction := NewInstall(config, ChartPathOptions{}, "", nil, "", "", "", "", "", "")
 	instAction.Namespace = "spaced"
 	instAction.ReleaseName = "test-install-release"
 

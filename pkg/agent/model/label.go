@@ -1,19 +1,12 @@
 package model
 
 const (
-	ParentWorkloadNameLabel = "choerodon.io/parent-workload-name"
-	ParentWorkloadLabel     = "choerodon.io/parent-workload"
-	AppLabel          = "choerodon.io/application"
-	AppVersionLabel   = "choerodon.io/version"
-	ReleaseLabel      = "choerodon.io/release"
-	NetworkLabel      = "choerodon.io/network"
-	NetworkNoDelLabel = "choerodon.io/no_delete"
-	AgentVersionLabel = "choerodon.io"
-	CommitLabel       = "choerodon.io/commit"
-	// 拼写错误，暂时不要更改
-	CommandLabel        = "choeroodn.io/command"
-	V1CommandLabel      = "choerodon.io/v1-command"
-	AppServiceIdLabel   = "choerodon.io/app-service-id"
-	V1AppServiceIdLabel = "choerodon.io/v1-app-service-id"
-	TestLabel           = "choerodon.io/test"
+	ResourceCluster   = "hskp.io/cluster"
+	ParentWorkloadNameLabel = "hskp.io/parent-workload-name"
+	ParentWorkloadLabel     = "hskp.io/parent-workload"
+	AppLabel          = "hskp.io/chart-name"
+	AppVersionLabel   = "hskp.io/chart-version"
+	ReleaseLabel      = "hskp.io/chart-release"
+	AgentVersionLabel = "hskp.io"
+	CommitLabel       = "hskp.io/commit"
 )

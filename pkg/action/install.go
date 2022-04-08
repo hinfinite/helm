@@ -104,17 +104,12 @@ type Install struct {
 	UseReleaseName bool
 	PostRenderer   postrender.PostRenderer
 
-	Command         int64
-	V1Command       string
 	Commit          string
 	ImagePullSecret []v1.LocalObjectReference
 	ChartName       string
 	ChartVersion    string
-	AppServiceId    int64
-	V1AppServiceId  string
+	ClusterCode  string
 	AgentVersion    string
-	TestLabel       string
-	IsTest          bool
 }
 
 // ChartPathOptions captures common options used for controlling chart paths
@@ -134,34 +129,24 @@ type ChartPathOptions struct {
 func NewInstall(cfg *Configuration,
 	chartPathOptions ChartPathOptions,
 	commit string,
-	command int64,
-	v1Command string,
 	imagePullSecret []v1.LocalObjectReference,
 	namespace string,
 	releaseName string,
 	chartName string,
 	chartVersion string,
-	appServiceId int64,
-	v1AppServiceId string,
-	agentVersion string,
-	testLabel string,
-	isTest bool) *Install {
+	clusterCode string,
+	agentVersion string) *Install {
 	return &Install{
 		ChartPathOptions: chartPathOptions,
 		cfg:              cfg,
 		Commit:           commit,
-		Command:          command,
-		V1Command:        v1Command,
 		ImagePullSecret:  imagePullSecret,
 		Namespace:        namespace,
 		ReleaseName:      releaseName,
 		ChartName:        chartName,
 		ChartVersion:     chartVersion,
-		AppServiceId:     appServiceId,
-		V1AppServiceId:   v1AppServiceId,
+		ClusterCode:      clusterCode,
 		AgentVersion:     agentVersion,
-		TestLabel:        testLabel,
-		IsTest:           isTest,
 		CreateNamespace:  true,
 	}
 }
@@ -295,7 +280,7 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 
 	// 在这里对要创建的对象添加标签
 	for _, r := range resources {
-		err = action.AddLabel(i.ImagePullSecret, i.Command, i.V1Command, i.AppServiceId, i.V1AppServiceId, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.TestLabel, i.Namespace, i.IsTest, false, nil)
+		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -375,7 +360,7 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 
 	// pre-install hooks
 	if !i.DisableHooks {
-		if err := i.cfg.execHook(rel, release.HookPreInstall, i.Timeout, i.ImagePullSecret, i.Command, i.V1Command, i.AppServiceId, i.V1AppServiceId, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.TestLabel, i.Namespace, i.IsTest); err != nil {
+		if err := i.cfg.execHook(rel, release.HookPreInstall, i.Timeout, i.ImagePullSecret, i.ClusterCode, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace); err != nil {
 			return i.failRelease(rel, fmt.Errorf("failed pre-install: %s", err))
 		}
 	}
@@ -401,7 +386,7 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 	}
 
 	if !i.DisableHooks {
-		if err := i.cfg.execHook(rel, release.HookPostInstall, i.Timeout, i.ImagePullSecret, i.Command, i.V1Command, i.AppServiceId, i.V1AppServiceId, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.TestLabel, i.Namespace, i.IsTest); err != nil {
+		if err := i.cfg.execHook(rel, release.HookPostInstall, i.Timeout, i.ImagePullSecret, i.ClusterCode, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace); err != nil {
 			return i.failRelease(rel, fmt.Errorf("failed post-install: %s", err))
 		}
 	}

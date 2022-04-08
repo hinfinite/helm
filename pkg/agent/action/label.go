@@ -2,8 +2,6 @@ package action
 
 import (
 	"fmt"
-	"strconv"
-
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
 	v1 "k8s.io/api/core/v1"
@@ -15,13 +13,14 @@ import (
 )
 
 func AddLabel(imagePullSecret []v1.LocalObjectReference,
-	command int64,
-	V1Command string,
-	appServiceId int64,
-	V1AppServiceId string,
+	clusterCode string,
 	info *resource.Info,
-	commit, version, releaseName, chartName, agentVersion, testLabel, namespace string,
-	isTest bool,
+	commit,
+	version,
+	releaseName,
+	chartName,
+	agentVersion,
+	namespace string,
 	isUpgrade bool,
 	clientSet *kubernetes.Clientset) error {
 	t := info.Object.(*unstructured.Unstructured)
@@ -37,6 +36,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		l[model.ReleaseLabel] = releaseName
 		l[model.AgentVersionLabel] = agentVersion
 		l[model.CommitLabel] = commit
+		l[model.ResourceCluster] = clusterCode
 	}
 	var addAppLabels = func() {
 		l[model.AppLabel] = chartName
@@ -50,16 +50,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		tplLabels[model.CommitLabel] = commit
 		tplLabels[model.ParentWorkloadLabel] = workloadKind
 		tplLabels[model.ParentWorkloadNameLabel] = workloadName
-		//12.05 新增打标签。
-		//0 表示的是安装未填入值 -1代表更新
-		if (appServiceId != 0 && appServiceId != -1) || (V1AppServiceId != "0" && V1AppServiceId != "-1") {
-			tplLabels[model.AppServiceIdLabel] = strconv.FormatInt(appServiceId, 10)
-			tplLabels[model.V1AppServiceIdLabel] = V1AppServiceId
-		}
-		if !isTest {
-			tplLabels[model.CommandLabel] = strconv.Itoa(int(command))
-			tplLabels[model.V1CommandLabel] = V1Command
-		}
+
 		tplLabels[model.AppLabel] = chartName
 		tplLabels[model.AppVersionLabel] = version
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
@@ -143,19 +134,11 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 	case "ConfigMap":
 	case "Service":
-		l[model.NetworkLabel] = "service"
-		l[model.NetworkNoDelLabel] = "true"
 	case "Ingress":
-		l[model.NetworkLabel] = "ingress"
-		l[model.NetworkNoDelLabel] = "true"
 	case "Job":
 		addImagePullSecrets()
 		tplLabels := getTemplateLabels(t.Object)
-		if isTest {
-			l[model.TestLabel] = testLabel
-			tplLabels[model.TestLabel] = testLabel
-			tplLabels[model.ReleaseLabel] = releaseName
-		}
+		tplLabels[model.ReleaseLabel] = releaseName
 		tplLabels[model.CommitLabel] = commit
 		tplLabels[model.ParentWorkloadLabel] = kind
 		tplLabels[model.ParentWorkloadNameLabel] = t.GetName()
@@ -199,7 +182,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		glog.Warningf("Skipping to add choerodon label, object: Kind %s of Release %s", kind, releaseName)
 		return nil
 	}
-	if t.GetNamespace() != "" && t.GetNamespace() != namespace && chartName != "prometheus-operator" {
+	if t.GetNamespace() != "" && t.GetNamespace() != namespace {
 		return fmt.Errorf(" Kind:%s Name:%s. The namespace of this resource is not consistent with helm release", kind, t.GetName())
 	}
 	// add base labels
