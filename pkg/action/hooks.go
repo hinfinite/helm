@@ -66,19 +66,13 @@ func (cfg *Configuration) execHook(rl *release.Release,
 			hook,
 			timeout,
 			imagePullSecret,
-			command,
-			v1Command,
-			appServiceId,
-			v1AppServiceId,
+			clusterCode,
 			commit,
 			chartVersion,
 			releaseName,
 			chartName,
 			agentVersion,
-			testLabel,
-			namespace,
-			isTest,
-		); err != nil {
+			namespace); err != nil {
 			return err
 		}
 	}
@@ -163,18 +157,13 @@ func (cfg *Configuration) executeHookByWeightParallel(
 	hook release.HookEvent,
 	timeout time.Duration,
 	imagePullSecret []v1.LocalObjectReference,
-	command int64,
-	v1Command string,
-	appServiceId int64,
-	v1AppServiceId string,
+	clusterCode string,
 	commit,
 	chartVersion,
 	releaseName,
 	chartName,
 	agentVersion,
-	testLabel,
-	namespace string,
-	isTest bool) error {
+	namespace string) error {
 
 	// Wait for parallism execution
 	wg := new(sync.WaitGroup)
