@@ -22,10 +22,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"helm.sh/helm/v3/internal/tlsutil"
-
 	"sigs.k8s.io/yaml"
 
+	"github.com/hinfinite/helm/internal/tlsutil"
 	"github.com/hinfinite/helm/pkg/repo"
 )
 
