@@ -20,13 +20,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
+	"strings"
 
 	"github.com/hinfinite/helm/cmd/helm/search"
 	"github.com/hinfinite/helm/pkg/action"
+	"github.com/hinfinite/helm/pkg/chart"
 	"github.com/hinfinite/helm/pkg/cli"
 	"github.com/hinfinite/helm/pkg/paginator"
 	"github.com/hinfinite/helm/pkg/paginator/adapter"
+	"sigs.k8s.io/yaml"
 )
 
 // getCfg get helm config
@@ -77,12 +79,6 @@ type ChartSummary struct {
 	Description string `json:"description,omitempty"`
 	// The URL to an icon file.
 	Icon string `json:"icon,omitempty"`
-
-	// Others
-	Created time.Time `json:"created,omitempty"`
-	Removed bool      `json:"removed,omitempty"`
-	Digest  string    `json:"digest,omitempty"`
-	Score   int       `json:"score,omitempty"`
 }
 
 type ListOptions struct {
@@ -136,10 +132,6 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 			AppVersion:  item.Chart.AppVersion,
 			Description: item.Chart.Description,
 			Icon:        item.Chart.Icon,
-			Created:     item.Chart.Created,
-			Removed:     item.Chart.Removed,
-			Digest:      item.Chart.Digest,
-			Score:       item.Score,
 		})
 	}
 
@@ -160,4 +152,104 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 	}
 
 	return pageResult, nil
+}
+
+type ShowOptions struct {
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+type ChartDetail struct {
+	ChartSummary
+	Values   string   `json:"values,omitempty"`
+	Readme   string   `json:"readme,omitempty"`
+	Versions []string `json:"versions,omitempty"`
+}
+
+// ShowDetail show chart details with multiple versions
+func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions) (*ChartDetail, error) {
+	// Add repo
+	AddRepo(namespace, repoConfig)
+
+	// Set show options
+	cfg, settings := getCfg(namespace)
+	client := action.NewShow(cfg, action.ShowAll, action.ChartPathOptions{Version: showOpts.Version})
+	client.Namespace = settings.Namespace()
+
+	qualifiedName := fmt.Sprintf("%s/%s", repoConfig.name, showOpts.Name)
+
+	// Values
+	client.OutputFormat = action.ShowValues
+	values, err := runShow([]string{qualifiedName}, client, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Readme
+	client.OutputFormat = action.ShowReadme
+	readme, err := runShow([]string{qualifiedName}, client, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Chart
+	client.OutputFormat = action.ShowChart
+	chartStr, err := runShow([]string{qualifiedName}, client, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	chart := &chart.Metadata{}
+	chartStr = strings.Replace(chartStr, "\n--- ChartInfo\n", "", 1)
+	err = yaml.Unmarshal([]byte(chartStr), chart)
+	if err != nil {
+		return nil, err
+	}
+
+	// Versions
+	versions := make([]string, 0)
+	o := &searchRepoOptions{
+		repoFile:     settings.RepositoryConfig,
+		repoCacheDir: settings.RepositoryCache,
+		regexp:       false,
+		versions:     true,
+	}
+	o.setupSearchedVersion()
+
+	// Build index
+	index, err := o.buildIndex()
+	if err != nil {
+		return nil, err
+	}
+
+	// List in current repo, note the keyword construct
+	res, err := index.Search(qualifiedName, searchMaxScore, o.regexp)
+	if err != nil {
+		return nil, err
+	}
+
+	search.SortScore(res)
+	data, err := o.applyConstraint(res)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range data {
+		if item.Name == qualifiedName {
+			versions = append(versions, item.Chart.Version)
+		}
+	}
+
+	return &ChartDetail{
+		ChartSummary: ChartSummary{
+			Name:        chart.Name,
+			Version:     chart.Version,
+			AppVersion:  chart.AppVersion,
+			Description: chart.Description,
+			Icon:        chart.Icon,
+		},
+		Values:   values,
+		Readme:   readme,
+		Versions: versions,
+	}, nil
 }

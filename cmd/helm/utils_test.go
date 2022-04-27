@@ -72,3 +72,50 @@ func TestListChart(t *testing.T) {
 		})
 	}
 }
+
+func TestShowDetail(t *testing.T) {
+	type args struct {
+		namespace  string
+		repoConfig *RepoConfig
+		showOpts   *ShowOptions
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *ChartDetail
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "round 1",
+			args: args{
+				namespace: "hskp-demo",
+				repoConfig: &RepoConfig{
+					name:     "hskp-demo",
+					url:      "http://harbor.open.hand-china.com/chartrepo/hsop-test",
+					username: "hsopDeployer",
+					password: "kjDJHGDJshfaflasfa34",
+				},
+				showOpts: &ShowOptions{
+					Name:    "mysql",
+					Version: "8.8.22",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ShowDetail(tt.args.namespace, tt.args.repoConfig, tt.args.showOpts)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "show chart with error: %s", err.Error())
+			}
+
+			data, err := json.MarshalIndent(got, "", "  ")
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "marshal show chart page data with error: %s", err.Error())
+			}
+
+			fmt.Println(string(data))
+		})
+	}
+}
