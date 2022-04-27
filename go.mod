@@ -45,7 +45,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/xeipuuv/gojsonschema v1.1.0
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
-	gopkg.in/yaml.v2 v2.3.0
 	gorm.io/driver/sqlite v1.3.2
 	gorm.io/gorm v1.23.5
 	gotest.tools/v3 v3.1.0 // indirect
