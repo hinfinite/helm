@@ -43,8 +43,9 @@ type (
 	Paginator interface {
 		SetPage(page int)
 		Page() (int, error)
-		ToPageResults(data interface{}) (*Page, error)
 		Results(data interface{}) error
+		PageResults(page int, data interface{}) (*Page, error)
+		ToPageResults(data interface{}) (*Page, error)
 		Nums() (int64, error)
 		HasPages() (bool, error)
 		HasNext() (bool, error)
@@ -113,6 +114,20 @@ func (p paginator) Results(data interface{}) error {
 	}
 
 	return p.adapter.Slice(offset, p.maxPerPage, data)
+}
+
+// PageResults stores the current page results into data argument which must be a pointer to a slice. then return to a page struct.
+func (p paginator) PageResults(page int, data interface{}) (*Page, error) {
+	p.SetPage(page)
+
+	// Find current page data
+	err := p.Results(data)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return to page struct
+	return p.ToPageResults(data)
 }
 
 // Results stores the current page results into data argument which must be a pointer to a slice.

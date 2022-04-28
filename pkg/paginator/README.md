@@ -1,9 +1,5 @@
 # Paginator
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/vcraescu/go-paginator?kill_cache=2)](https://goreportcard.com/report/github.com/vcraescu/go-paginator) 
-[![Build Status](https://travis-ci.com/vcraescu/go-paginator.svg?branch=master&kill_cache=2)](https://travis-ci.com/vcraescu/go-paginator) 
-[![Coverage Status](https://coveralls.io/repos/github/vcraescu/go-paginator/badge.svg?branch=master&kill_cache=2)](https://coveralls.io/github/vcraescu/go-paginator?branch=master)
-
 A simple way to implement pagination in Golang.
 
 ## Usage
@@ -13,8 +9,8 @@ package main
 
 import (
     "fmt"
-    "github.com/vcraescu/go-paginator/v2"
-    "github.com/vcraescu/go-paginator/v2/adapter"
+    "github.com/hinfinite/helm/pkg/paginator"
+    "github.com/hinfinite/helm/pkg/paginator/adapter"
     "gorm.io/driver/sqlite"
     "gorm.io/gorm"
     "time"
@@ -96,6 +92,47 @@ var pages []int
 p := paginator.New(adapter.NewSliceAdapter(pages), 10)
 ```
 
+## Result
+
+```go
+// Paginate
+var dataSlice []int
+int size = 10
+int page = 1
+
+p := paginator.New(adapter.NewSliceAdapter(dataSlice), size)
+dataSliceInCurrentPage := make([]int, 0)
+// Note the data arguments must be the pointer to slice
+pageResult, err := p.PageResults(page, &dataSliceInCurrentPage)
+if err != nil {
+// error handler
+}
+```
+
+equivalent to
+
+```go
+// Paginate
+var dataSlice []int
+int size = 10
+int page = 1
+
+p := paginator.New(adapter.NewSliceAdapter(dataSlice), size)
+p.setPage(page)
+
+dataSliceInCurrentPage := make([]int, 0)
+// Note the data arguments must be the pointer to slice
+err := p.Results(&dataSliceInCurrentPage)
+if err != nil {
+// error handler
+}
+
+pageResult, err := p.ToPageResults(page, dataSliceInCurrentPage)
+if err != nil {
+// error handler
+}
+```
+
 ## Views
 
 View models contains all necessary logic to render the paginator inside a template.
@@ -139,7 +176,7 @@ func main() {
 
 ## Changelog
 
-* [v2.0.0](https://github.com/vcraescu/go-paginator/blob/v2.0.0/CHANGELOG-2.0.md)
+* [v2.0.0](./CHANGELOG-2.0.md)
 
 ## TODO
 
@@ -147,4 +184,4 @@ func main() {
 
 ## License
 
-Paginator is licensed under the [MIT License](LICENSE).
+Paginator is licensed under the [MIT License](./LICENSE).

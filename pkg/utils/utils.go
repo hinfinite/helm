@@ -14,35 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package utils
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
-	"github.com/hinfinite/helm/cmd/helm/search"
 	"github.com/hinfinite/helm/pkg/action"
 	"github.com/hinfinite/helm/pkg/chart"
-	"github.com/hinfinite/helm/pkg/cli"
 	"github.com/hinfinite/helm/pkg/paginator"
 	"github.com/hinfinite/helm/pkg/paginator/adapter"
 	"sigs.k8s.io/yaml"
 )
-
-// getCfg get helm config
-func getCfg(namespace string) (*action.Configuration, *cli.EnvSettings) {
-	settings := cli.New()
-	settings.SetNamespace(namespace)
-	actionConfig := &action.Configuration{}
-
-	helmDriver := os.Getenv("HELM_DRIVER")
-	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), helmDriver, debug); err != nil {
-		log.Fatal(err)
-	}
-	return actionConfig, settings
-}
 
 // RepoConfig repo config to add
 type RepoConfig struct {
@@ -56,7 +40,7 @@ type RepoConfig struct {
 func AddRepo(namespace string, repoConfig *RepoConfig) error {
 	_, settings := getCfg(namespace)
 
-	o := &repoAddOptions{
+	o := &RepoAddOptions{
 		repoFile:              settings.RepositoryConfig,
 		repoCache:             settings.RepositoryCache,
 		name:                  repoConfig.name,
@@ -65,6 +49,7 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 		password:              repoConfig.password,
 		noUpdate:              false,
 		insecureSkipTLSverify: false,
+		settings:              settings,
 	}
 	return o.run(os.Stdout)
 }
@@ -93,33 +78,20 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 
 	// Set search options
 	_, settings := getCfg(namespace)
-	o := &searchRepoOptions{
+	o := &SearchRepoOptions{
 		repoFile:     settings.RepositoryConfig,
 		repoCacheDir: settings.RepositoryCache,
 		regexp:       true,
 	}
-	o.setupSearchedVersion()
 
-	// Build index
-	index, err := o.buildIndex()
-	if err != nil {
-		return nil, err
+	// List in current repo
+	args := make([]string, 0)
+	if listOpts.NameKeyword != "" {
+		args = append(args, fmt.Sprintf("%s/*%s*", repoConfig.name, listOpts.NameKeyword))
 	}
 
-	// List in current repo, note the keyword construct
-	var res []*search.Result
-	if listOpts.NameKeyword == "" {
-		res = index.All()
-	} else {
-		q := fmt.Sprintf("%s/*%s*", repoConfig.name, listOpts.NameKeyword)
-		res, err = index.Search(q, searchMaxScore, o.regexp)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	search.SortScore(res)
-	data, err := o.applyConstraint(res)
+	// run search
+	data, err := o.run(args)
 	if err != nil {
 		return nil, err
 	}
@@ -137,16 +109,9 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 
 	// Paginate
 	p := paginator.New(adapter.NewSliceAdapter(chartSummarySlice), listOpts.Size)
-	p.SetPage(listOpts.Page)
-
 	chartSummaryInCurrentPage := make([]*ChartSummary, 0)
-	// Note: here must be the pointer to slice
-	err = p.Results(&chartSummaryInCurrentPage)
-	if err != nil {
-		return nil, err
-	}
-
-	pageResult, err := p.ToPageResults(chartSummaryInCurrentPage)
+	// Note the data arguments must be the pointer to slice
+	pageResult, err := p.PageResults(listOpts.Page, &chartSummaryInCurrentPage)
 	if err != nil {
 		return nil, err
 	}
@@ -180,21 +145,21 @@ func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions)
 
 	// Values
 	client.OutputFormat = action.ShowValues
-	values, err := runShow([]string{qualifiedName}, client, nil)
+	values, err := runShow([]string{qualifiedName}, client, nil, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	// Readme
 	client.OutputFormat = action.ShowReadme
-	readme, err := runShow([]string{qualifiedName}, client, nil)
+	readme, err := runShow([]string{qualifiedName}, client, nil, settings)
 	if err != nil {
 		return nil, err
 	}
 
 	// Chart
 	client.OutputFormat = action.ShowChart
-	chartStr, err := runShow([]string{qualifiedName}, client, nil)
+	chartStr, err := runShow([]string{qualifiedName}, client, nil, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -208,28 +173,15 @@ func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions)
 
 	// Versions
 	versions := make([]string, 0)
-	o := &searchRepoOptions{
+	o := &SearchRepoOptions{
 		repoFile:     settings.RepositoryConfig,
 		repoCacheDir: settings.RepositoryCache,
 		regexp:       false,
 		versions:     true,
 	}
-	o.setupSearchedVersion()
 
-	// Build index
-	index, err := o.buildIndex()
-	if err != nil {
-		return nil, err
-	}
-
-	// List in current repo, note the keyword construct
-	res, err := index.Search(qualifiedName, searchMaxScore, o.regexp)
-	if err != nil {
-		return nil, err
-	}
-
-	search.SortScore(res)
-	data, err := o.applyConstraint(res)
+	// Run Search
+	data, err := o.run([]string{qualifiedName})
 	if err != nil {
 		return nil, err
 	}
