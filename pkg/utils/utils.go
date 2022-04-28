@@ -30,10 +30,10 @@ import (
 
 // RepoConfig repo config to add
 type RepoConfig struct {
-	name     string
-	url      string
-	username string
-	password string
+	Name     string
+	Url      string
+	Username string
+	Password string
 }
 
 // AddRepo add repo
@@ -43,10 +43,10 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 	o := &RepoAddOptions{
 		repoFile:              settings.RepositoryConfig,
 		repoCache:             settings.RepositoryCache,
-		name:                  repoConfig.name,
-		url:                   repoConfig.url,
-		username:              repoConfig.username,
-		password:              repoConfig.password,
+		name:                  repoConfig.Name,
+		url:                   repoConfig.Url,
+		username:              repoConfig.Username,
+		password:              repoConfig.Password,
 		noUpdate:              false,
 		insecureSkipTLSverify: false,
 		settings:              settings,
@@ -87,7 +87,7 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 	// List in current repo
 	args := make([]string, 0)
 	if listOpts.NameKeyword != "" {
-		args = append(args, fmt.Sprintf("%s/*%s*", repoConfig.name, listOpts.NameKeyword))
+		args = append(args, fmt.Sprintf("%s/*%s*", repoConfig.Name, listOpts.NameKeyword))
 	}
 
 	// run search
@@ -141,7 +141,7 @@ func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions)
 	client := action.NewShow(cfg, action.ShowAll, action.ChartPathOptions{Version: showOpts.Version})
 	client.Namespace = settings.Namespace()
 
-	qualifiedName := fmt.Sprintf("%s/%s", repoConfig.name, showOpts.Name)
+	qualifiedName := fmt.Sprintf("%s/%s", repoConfig.Name, showOpts.Name)
 
 	// Values
 	client.OutputFormat = action.ShowValues
