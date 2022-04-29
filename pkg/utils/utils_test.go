@@ -27,7 +27,7 @@ import (
 
 const (
 	username = "hsopDeployer"
-	password = "xxx"
+	password = ""
 )
 
 func TestListChart(t *testing.T) {
@@ -54,8 +54,8 @@ func TestListChart(t *testing.T) {
 					Password: password,
 				},
 				listOpts: &ListOptions{
-					NameKeyword: "hzero",
-					Page:        2,
+					NameKeyword: "",
+					Page:        0,
 					Size:        2,
 				},
 			},

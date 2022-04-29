@@ -177,6 +177,27 @@ func (i *Index) SearchRegexp(re string, threshold int) ([]*Result, error) {
 	return buf, nil
 }
 
+// SearchInNameRegexp searches using a regular expression in Name. by allen.liu @2022-04-29
+func (i *Index) SearchInNameRegexp(re string, threshold int) ([]*Result, error) {
+	matcher, err := regexp.Compile(re)
+	if err != nil {
+		return []*Result{}, err
+	}
+	buf := []*Result{}
+	for k, v := range i.lines {
+		// find in name
+		ind := matcher.FindStringIndex(k)
+		if len(ind) == 0 {
+			continue
+		}
+		if score := i.calcScore(ind[0], v); ind[0] >= 0 && score < threshold {
+			parts := strings.Split(k, verSep) // Remove version, if it is there.
+			buf = append(buf, &Result{Name: parts[0], Score: score, Chart: i.charts[k]})
+		}
+	}
+	return buf, nil
+}
+
 // SortScore does an in-place sort of the results.
 //
 // Lowest scores are highest on the list. Matching scores are subsorted alphabetically.

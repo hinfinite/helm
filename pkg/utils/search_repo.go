@@ -43,7 +43,9 @@ func (o *SearchRepoOptions) run(args []string) ([]*search.Result, error) {
 		res = index.All()
 	} else {
 		q := strings.Join(args, " ")
-		res, err = index.Search(q, searchMaxScore, o.regexp)
+		// Fix by allen.liu @2022-04-29 search in name not in all field lines
+		// res, err = index.Search(q, searchMaxScore, o.regexp)
+		res, err = index.SearchInNameRegexp(q, searchMaxScore)
 		if err != nil {
 			return nil, err
 		}
