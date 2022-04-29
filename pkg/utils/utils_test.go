@@ -25,6 +25,11 @@ import (
 	"github.com/hinfinite/helm/pkg/paginator"
 )
 
+const (
+	username = "hsopDeployer"
+	password = "xxx"
+)
+
 func TestListChart(t *testing.T) {
 	type args struct {
 		namespace  string
@@ -45,8 +50,8 @@ func TestListChart(t *testing.T) {
 				repoConfig: &RepoConfig{
 					Name:     "hskp-demo",
 					Url:      "http://harbor.open.hand-china.com/chartrepo/hsop-test",
-					Username: "hsopDeployer",
-					Password: "kjDJHGDJshfaflasfa34",
+					Username: username,
+					Password: password,
 				},
 				listOpts: &ListOptions{
 					NameKeyword: "hzero",
@@ -91,10 +96,10 @@ func TestShowDetail(t *testing.T) {
 			args: args{
 				namespace: "hskp-demo",
 				repoConfig: &RepoConfig{
-					Name:     "hskp-demo",
+					Name:     "HandChart",
 					Url:      "http://harbor.open.hand-china.com/chartrepo/hsop-test",
-					Username: "hsopDeployer",
-					Password: "kjDJHGDJshfaflasfa34",
+					Username: username,
+					Password: password,
 				},
 				showOpts: &ShowOptions{
 					Name:    "mysql",

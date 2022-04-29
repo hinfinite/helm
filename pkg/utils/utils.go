@@ -187,7 +187,9 @@ func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions)
 	}
 
 	for _, item := range data {
-		if item.Name == qualifiedName {
+		// Fix: the repo name part of item.Name in result of search will be automatically convert to lower case,
+		// then, the == with qualifiedName will be mismatched. use strings.EqualFold to ignore case
+		if strings.EqualFold(item.Name, qualifiedName) {
 			versions = append(versions, item.Chart.Version)
 		}
 	}
