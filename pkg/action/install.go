@@ -776,7 +776,8 @@ func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (
 	name = strings.TrimSpace(name)
 	version := strings.TrimSpace(c.Version)
 
-	if _, err := os.Stat(name); err == nil && strings.HasSuffix(name, ".tgz") {
+	// 去除&& strings.HasSuffix(name, ".tgz")判断
+	if _, err := os.Stat(name); err == nil {
 		abs, err := filepath.Abs(name)
 		if err != nil {
 			return abs, err
