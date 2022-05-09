@@ -171,7 +171,7 @@ func (cfg *Configuration) executeHookByWeightParallel(
 	ret := make([]HookWithResources, 0)
 
 	for _, h := range executingHooks {
-		go doExecuteHook(cfg, wg, ret, h, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
+		go doExecuteHook(cfg, wg, &ret, h, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
 	}
 	wg.Wait()
 
@@ -199,7 +199,7 @@ func (cfg *Configuration) executeHookByWeightParallel(
 
 func doExecuteHook(cfg *Configuration,
 	wg *sync.WaitGroup,
-	ret []HookWithResources,
+	ret *[]HookWithResources,
 	h *release.Hook,
 	rl *release.Release,
 	hook release.HookEvent,
