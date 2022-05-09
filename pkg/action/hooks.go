@@ -165,13 +165,20 @@ func (cfg *Configuration) executeHookByWeightParallel(
 	agentVersion,
 	namespace string) error {
 
-	// Wait for parallism execution
-	wg := new(sync.WaitGroup)
+	var wg sync.WaitGroup
 	wg.Add(len(executingHooks))
-	ret := make([]HookWithResources, 0)
+	ret := make([]*HookWithResources, 0)
 
 	for _, h := range executingHooks {
-		go doExecuteHook(cfg, wg, &ret, h, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
+		go func(releaseHook *release.Hook) error {
+			hookWithResources, err := doExecuteHook(cfg, releaseHook, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
+			if err != nil {
+				return err
+			}
+			ret = append(ret, hookWithResources)
+			wg.Done()
+			return nil
+		}(h)
 	}
 	wg.Wait()
 
@@ -198,8 +205,6 @@ func (cfg *Configuration) executeHookByWeightParallel(
 }
 
 func doExecuteHook(cfg *Configuration,
-	wg *sync.WaitGroup,
-	ret *[]HookWithResources,
 	h *release.Hook,
 	rl *release.Release,
 	hook release.HookEvent,
@@ -210,7 +215,7 @@ func doExecuteHook(cfg *Configuration,
 	releaseName string,
 	chartName string,
 	agentVersion string,
-	namespace string) error {
+	namespace string) (*HookWithResources, error) {
 	// Set default delete policy to before-hook-creation
 	if h.DeletePolicies == nil || len(h.DeletePolicies) == 0 {
 		// TODO(jlegrone): Only apply before-hook-creation delete policy to run to completion
@@ -221,7 +226,7 @@ func doExecuteHook(cfg *Configuration,
 	}
 
 	if err := cfg.deleteHookByPolicy(h, release.HookBeforeHookCreation); err != nil {
-		return err
+		return nil, err
 	}
 
 	resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), true)
@@ -231,12 +236,12 @@ func doExecuteHook(cfg *Configuration,
 		for _, r := range resources {
 			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
 	if err != nil {
-		return errors.Wrapf(err, "unable to build kubernetes object for %s hook %s", hook, h.Path)
+		return nil, errors.Wrapf(err, "unable to build kubernetes object for %s hook %s", hook, h.Path)
 	}
 
 	// Record the time at which the hook was applied to the cluster
@@ -255,15 +260,12 @@ func doExecuteHook(cfg *Configuration,
 	if _, err := cfg.KubeClient.Create(resources); err != nil {
 		h.LastRun.CompletedAt = helmtime.Now()
 		h.LastRun.Phase = release.HookPhaseFailed
-		return errors.Wrapf(err, "warning: Hook %s %s failed", hook, h.Path)
+		return nil, errors.Wrapf(err, "warning: Hook %s %s failed", hook, h.Path)
 	}
-
-	ret = append(ret, HookWithResources{
+	return &HookWithResources{
 		Hook:      h,
 		Resources: resources,
-	})
-	wg.Done()
-	return nil
+	}, nil
 }
 
 type HookWithResources struct {
