@@ -17,11 +17,11 @@ package action
 
 import (
 	"bytes"
+	"github.com/hinfinite/helm/pkg/agent/action"
 	"sort"
 	"sync"
 	"time"
 
-	"github.com/hinfinite/helm/pkg/agent/action"
 	"github.com/hinfinite/helm/pkg/kube"
 	v1 "k8s.io/api/core/v1"
 
@@ -171,60 +171,8 @@ func (cfg *Configuration) executeHookByWeightParallel(
 	ret := make([]HookWithResources, 0)
 
 	for _, h := range executingHooks {
-		// Set default delete policy to before-hook-creation
-		if h.DeletePolicies == nil || len(h.DeletePolicies) == 0 {
-			// TODO(jlegrone): Only apply before-hook-creation delete policy to run to completion
-			//                 resources. For all other resource types update in place if a
-			//                 resource with the same name already exists and is owned by the
-			//                 current release.
-			h.DeletePolicies = []release.HookDeletePolicy{release.HookBeforeHookCreation}
-		}
-
-		if err := cfg.deleteHookByPolicy(h, release.HookBeforeHookCreation); err != nil {
-			return err
-		}
-
-		resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), true)
-		// 如果是agent升级，则跳过添加标签这一步，因为agent原本是直接在集群中安装的没有对应标签，如果在这里加标签k8s会报错
-		if chartName != "hskp-devops-cluster-agent" {
-			// 在这里对要新chart包中的对象添加标签
-			for _, r := range resources {
-				err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		if err != nil {
-			return errors.Wrapf(err, "unable to build kubernetes object for %s hook %s", hook, h.Path)
-		}
-
-		// Record the time at which the hook was applied to the cluster
-		h.LastRun = release.HookExecution{
-			StartedAt: helmtime.Now(),
-			Phase:     release.HookPhaseRunning,
-		}
-		cfg.recordRelease(rl)
-
-		// As long as the implementation of WatchUntilReady does not panic, HookPhaseFailed or HookPhaseSucceeded
-		// should always be set by this function. If we fail to do that for any reason, then HookPhaseUnknown is
-		// the most appropriate value to surface.
-		h.LastRun.Phase = release.HookPhaseUnknown
-
-		// Create hook resources
-		if _, err := cfg.KubeClient.Create(resources); err != nil {
-			h.LastRun.CompletedAt = helmtime.Now()
-			h.LastRun.Phase = release.HookPhaseFailed
-			return errors.Wrapf(err, "warning: Hook %s %s failed", hook, h.Path)
-		}
-
-		ret = append(ret, HookWithResources{
-			Hook:      h,
-			Resources: resources,
-		})
-		wg.Done()
+		go doExecuteHook(cfg, wg, ret, h, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
 	}
-
 	wg.Wait()
 
 	// After parallel execution, then wait until ready
@@ -246,6 +194,75 @@ func (cfg *Configuration) executeHookByWeightParallel(
 		item.Hook.LastRun.Phase = release.HookPhaseSucceeded
 	}
 
+	return nil
+}
+
+func doExecuteHook(cfg *Configuration,
+	wg *sync.WaitGroup,
+	ret []HookWithResources,
+	h *release.Hook,
+	rl *release.Release,
+	hook release.HookEvent,
+	imagePullSecret []v1.LocalObjectReference,
+	clusterCode string,
+	commit string,
+	chartVersion string,
+	releaseName string,
+	chartName string,
+	agentVersion string,
+	namespace string) error {
+	// Set default delete policy to before-hook-creation
+	if h.DeletePolicies == nil || len(h.DeletePolicies) == 0 {
+		// TODO(jlegrone): Only apply before-hook-creation delete policy to run to completion
+		//                 resources. For all other resource types update in place if a
+		//                 resource with the same name already exists and is owned by the
+		//                 current release.
+		h.DeletePolicies = []release.HookDeletePolicy{release.HookBeforeHookCreation}
+	}
+
+	if err := cfg.deleteHookByPolicy(h, release.HookBeforeHookCreation); err != nil {
+		return err
+	}
+
+	resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), true)
+	// 如果是agent升级，则跳过添加标签这一步，因为agent原本是直接在集群中安装的没有对应标签，如果在这里加标签k8s会报错
+	if chartName != "hskp-devops-cluster-agent" {
+		// 在这里对要新chart包中的对象添加标签
+		for _, r := range resources {
+			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	if err != nil {
+		return errors.Wrapf(err, "unable to build kubernetes object for %s hook %s", hook, h.Path)
+	}
+
+	// Record the time at which the hook was applied to the cluster
+	h.LastRun = release.HookExecution{
+		StartedAt: helmtime.Now(),
+		Phase:     release.HookPhaseRunning,
+	}
+	cfg.recordRelease(rl)
+
+	// As long as the implementation of WatchUntilReady does not panic, HookPhaseFailed or HookPhaseSucceeded
+	// should always be set by this function. If we fail to do that for any reason, then HookPhaseUnknown is
+	// the most appropriate value to surface.
+	h.LastRun.Phase = release.HookPhaseUnknown
+
+	// Create hook resources
+	if _, err := cfg.KubeClient.Create(resources); err != nil {
+		h.LastRun.CompletedAt = helmtime.Now()
+		h.LastRun.Phase = release.HookPhaseFailed
+		return errors.Wrapf(err, "warning: Hook %s %s failed", hook, h.Path)
+	}
+
+	ret = append(ret, HookWithResources{
+		Hook:      h,
+		Resources: resources,
+	})
+	wg.Done()
 	return nil
 }
 
