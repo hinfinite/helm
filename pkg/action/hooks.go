@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"github.com/hinfinite/helm/pkg/agent/action"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/hinfinite/helm/pkg/kube"
@@ -165,22 +164,14 @@ func (cfg *Configuration) executeHookByWeightParallel(
 	agentVersion,
 	namespace string) error {
 
-	var wg sync.WaitGroup
-	wg.Add(len(executingHooks))
 	ret := make([]*HookWithResources, 0)
-
 	for _, h := range executingHooks {
-		go func(releaseHook *release.Hook) error {
-			hookWithResources, err := doExecuteHook(cfg, releaseHook, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
-			if err != nil {
-				return err
-			}
-			ret = append(ret, hookWithResources)
-			wg.Done()
-			return nil
-		}(h)
+		hookWithResources, err := doExecuteHook(cfg, h, rl, hook, imagePullSecret, clusterCode, commit, chartVersion, releaseName, chartName, agentVersion, namespace)
+		if err != nil {
+			return err
+		}
+		ret = append(ret, hookWithResources)
 	}
-	wg.Wait()
 
 	// After parallel execution, then wait until ready
 	for _, item := range ret {
