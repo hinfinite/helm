@@ -19,6 +19,7 @@ package action
 import (
 	"bytes"
 	"fmt"
+	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"path"
@@ -775,6 +776,9 @@ OUTER:
 func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (string, error) {
 	name = strings.TrimSpace(name)
 	version := strings.TrimSpace(c.Version)
+
+	glog.Info("========当前绝对路径========")
+	glog.Info(os.Getwd())
 
 	// 去除&& strings.HasSuffix(name, ".tgz")判断
 	if _, err := os.Stat(name); err == nil {
