@@ -779,7 +779,7 @@ func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (
 
 	glog.Info("========当前绝对路径========")
 	glog.Info(os.Getwd())
-
+	glog.Info(filepath.Abs(name))
 	// 去除&& strings.HasSuffix(name, ".tgz")判断
 	if _, err := os.Stat(name); err == nil {
 		abs, err := filepath.Abs(name)
