@@ -19,7 +19,6 @@ package action
 import (
 	"bytes"
 	"fmt"
-	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"path"
