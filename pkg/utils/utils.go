@@ -19,6 +19,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/hinfinite/helm/pkg/action"
@@ -87,7 +88,7 @@ func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) 
 	// List in current repo
 	args := make([]string, 0)
 	if listOpts.NameKeyword != "" {
-		args = append(args, fmt.Sprintf("^%s/.*%s.*$", repoConfig.Name, listOpts.NameKeyword))
+		args = append(args, fmt.Sprintf("^%s/.*%s.*$", repoConfig.Name, regexp.QuoteMeta(listOpts.NameKeyword)))
 	} else {
 		args = append(args, fmt.Sprintf("^%s/.*$", repoConfig.Name))
 	}

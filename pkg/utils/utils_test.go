@@ -48,13 +48,13 @@ func TestListChart(t *testing.T) {
 			args: args{
 				namespace: "hskp-demo",
 				repoConfig: &RepoConfig{
-					Name:     "hskp-demo",
-					Url:      "http://harbor.open.hand-china.com/chartrepo/hsop-test",
+					Name:     "hzero",
+					Url:      "http://harbor.open.hand-china.com/chartrepo/hzero",
 					Username: username,
 					Password: password,
 				},
 				listOpts: &ListOptions{
-					NameKeyword: "",
+					NameKeyword: "${artifactIdName}",
 					Page:        0,
 					Size:        2,
 				},
@@ -94,16 +94,16 @@ func TestShowDetail(t *testing.T) {
 		{
 			name: "round 1",
 			args: args{
-				namespace: "hskp-demo",
+				namespace: "hzero",
 				repoConfig: &RepoConfig{
-					Name:     "HandChart",
-					Url:      "http://harbor.open.hand-china.com/chartrepo/hsop-test",
+					Name:     "hzero",
+					Url:      "http://harbor.open.hand-china.com/chartrepo/hzero",
 					Username: username,
 					Password: password,
 				},
 				showOpts: &ShowOptions{
-					Name:    "mysql",
-					Version: "8.8.22",
+					Name:    "${artifactIdName}",
+					Version: "1.3.1",
 				},
 			},
 		},
