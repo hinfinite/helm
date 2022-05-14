@@ -246,10 +246,10 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 	target, err := u.cfg.KubeClient.Build(bytes.NewBufferString(upgradedRelease.Manifest), !u.DisableOpenAPIValidation)
 
 	// 如果是agent升级，则跳过添加标签这一步，因为agent原本是直接在集群中安装的没有对应标签，如果在这里加标签k8s会报错
-	if u.ChartName != "choerodon-cluster-agent" {
+	if u.ChartName != "hskp-devops-cluster-agent" {
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range target {
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, "", true, u.cfg.ClientSet)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet)
 			if err != nil {
 				return nil, err
 			}
