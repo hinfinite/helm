@@ -55,25 +55,20 @@ func (cfg *Configuration) execHook(rl *release.Release,
 	// hooke are pre-ordered by kind, so keep order stable
 	sort.Stable(hookByWeight(executingHooks))
 
-	// group by weight begin
-	hookGroupByWeight := hookGroupByWeight(executingHooks)
-	for _, v := range hookGroupByWeight {
-		// parallel execution with same weight
-		if err := cfg.executeHookByWeightParallel(
-			v,
-			rl,
-			hook,
-			timeout,
-			imagePullSecret,
-			clusterCode,
-			commit,
-			chartVersion,
-			releaseName,
-			chartName,
-			agentVersion,
-			namespace); err != nil {
-			return err
-		}
+	if err := cfg.executeHooks(
+		executingHooks,
+		rl,
+		hook,
+		timeout,
+		imagePullSecret,
+		clusterCode,
+		commit,
+		chartVersion,
+		releaseName,
+		chartName,
+		agentVersion,
+		namespace); err != nil {
+		return err
 	}
 	// group by weight end by allen.liu
 
@@ -150,7 +145,7 @@ func hookGroupByWeight(hookByWeight []*release.Hook) map[int][]*release.Hook {
 }
 
 // parallel execution with same weight
-func (cfg *Configuration) executeHookByWeightParallel(
+func (cfg *Configuration) executeHooks(
 	executingHooks []*release.Hook,
 	rl *release.Release,
 	hook release.HookEvent,
