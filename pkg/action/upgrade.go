@@ -207,8 +207,8 @@ func (u *Upgrade) prepareUpgrade(name string, chart *chart.Chart, vals map[strin
 	if err != nil {
 		return nil, nil, err
 	}
-
-	hooks, manifestDoc, notesTxt, err := u.cfg.renderResources(chart, valuesToRender, "", "", u.SubNotes, false, false, u.PostRenderer)
+	var resourceChartMap map[string]string
+	hooks, manifestDoc, resourceChartMap, notesTxt, err := u.cfg.renderResources(chart, valuesToRender, "", "", u.SubNotes, false, false, u.PostRenderer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -229,6 +229,7 @@ func (u *Upgrade) prepareUpgrade(name string, chart *chart.Chart, vals map[strin
 		Version:  revision,
 		Manifest: manifestDoc.String(),
 		Hooks:    hooks,
+		ResourceChartMap: resourceChartMap,
 	}
 
 	if len(notesTxt) > 0 {

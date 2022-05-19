@@ -152,7 +152,7 @@ func (s *Show) FindHooks(chrt *chart.Chart, vals map[string]interface{}) ([]*rel
 		return nil, err
 	}
 	valuesToRender, err := chartutil.ToRenderValues(chrt, vals, options, caps)
-	hooks, _, _, err := s.cfg.renderResources(chrt, valuesToRender, chrt.Name(), "", false, true, false, nil)
+	hooks, _, _, _, err := s.cfg.renderResources(chrt, valuesToRender, chrt.Name(), "", false, true, false, nil)
 	if err != nil {
 		return nil, err
 	}

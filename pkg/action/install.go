@@ -108,7 +108,7 @@ type Install struct {
 	ImagePullSecret []v1.LocalObjectReference
 	ChartName       string
 	ChartVersion    string
-	ClusterCode  string
+	ClusterCode     string
 	AgentVersion    string
 }
 
@@ -260,7 +260,7 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 	rel := i.createRelease(chrt, vals, valsRaw)
 
 	var manifestDoc *bytes.Buffer
-	rel.Hooks, manifestDoc, rel.Info.Notes, err = i.cfg.renderResources(chrt, valuesToRender, i.ReleaseName, i.OutputDir, i.SubNotes, i.UseReleaseName, i.IncludeCRDs, i.PostRenderer)
+	rel.Hooks, manifestDoc, rel.ResourceChartMap, rel.Info.Notes, err = i.cfg.renderResources(chrt, valuesToRender, i.ReleaseName, i.OutputDir, i.SubNotes, i.UseReleaseName, i.IncludeCRDs, i.PostRenderer)
 	// Even for errors, attach this if available
 	if manifestDoc != nil {
 		rel.Manifest = manifestDoc.String()
@@ -515,18 +515,18 @@ func (i *Install) replaceRelease(rel *release.Release) error {
 }
 
 // renderResources renders the templates in a chart
-func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values, releaseName, outputDir string, subNotes, useReleaseName, includeCrds bool, pr postrender.PostRenderer) ([]*release.Hook, *bytes.Buffer, string, error) {
+func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values, releaseName, outputDir string, subNotes, useReleaseName, includeCrds bool, pr postrender.PostRenderer) ([]*release.Hook, *bytes.Buffer, map[string]string, string, error) {
 	hs := []*release.Hook{}
 	b := bytes.NewBuffer(nil)
 
 	caps, err := c.getCapabilities()
 	if err != nil {
-		return hs, b, "", err
+		return hs, b, nil, "", err
 	}
 
 	if ch.Metadata.KubeVersion != "" {
 		if !chartutil.IsCompatibleRange(ch.Metadata.KubeVersion, caps.KubeVersion.String()) {
-			return hs, b, "", errors.Errorf("chart requires kubeVersion: %s which is incompatible with Kubernetes %s", ch.Metadata.KubeVersion, caps.KubeVersion.String())
+			return hs, b, nil, "", errors.Errorf("chart requires kubeVersion: %s which is incompatible with Kubernetes %s", ch.Metadata.KubeVersion, caps.KubeVersion.String())
 		}
 	}
 
@@ -536,7 +536,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	if c.RESTClientGetter != nil {
 		rest, err := c.RESTClientGetter.ToRESTConfig()
 		if err != nil {
-			return hs, b, "", err
+			return hs, b, nil, "", err
 		}
 		files, err2 = engine.RenderWithClient(ch, values, rest)
 	} else {
@@ -544,7 +544,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	}
 
 	if err2 != nil {
-		return hs, b, "", err2
+		return hs, b, nil, "", err2
 	}
 
 	// NOTES.txt gets rendered like all the other files, but because it's not a hook nor a resource,
@@ -571,6 +571,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	// as partials are not used after renderer.Render. Empty manifests are also
 	// removed here.
 	hs, manifests, err := releaseutil.SortManifests(files, caps.APIVersions, releaseutil.InstallOrder)
+	resourceChartMap := resourceChartMapping(hs, manifests)
 	if err != nil {
 		// By catching parse errors here, we can prevent bogus releases from going
 		// to Kubernetes.
@@ -583,7 +584,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 			}
 			fmt.Fprintf(b, "---\n# Source: %s\n%s\n", name, content)
 		}
-		return hs, b, "", err
+		return hs, b, nil, "", err
 	}
 
 	// Aggregate all valid manifests into one big doc.
@@ -596,7 +597,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 			} else {
 				err = writeToFile(outputDir, crd.Filename, string(crd.File.Data[:]), fileWritten[crd.Name])
 				if err != nil {
-					return hs, b, "", err
+					return hs, b, nil, "", err
 				}
 				fileWritten[crd.Name] = true
 			}
@@ -617,7 +618,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 			// used by install or upgrade
 			err = writeToFile(newDir, m.Name, m.Content, fileWritten[m.Name])
 			if err != nil {
-				return hs, b, "", err
+				return hs, b, nil, "", err
 			}
 			fileWritten[m.Name] = true
 		}
@@ -626,11 +627,41 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	if pr != nil {
 		b, err = pr.Run(b)
 		if err != nil {
-			return hs, b, notes, errors.Wrap(err, "error while running post render on files")
+			return hs, b, nil, notes, errors.Wrap(err, "error while running post render on files")
 		}
 	}
 
-	return hs, b, notes, nil
+	return hs, b, resourceChartMap, notes, nil
+}
+
+func resourceChartMapping(hs []*release.Hook, manifests []releaseutil.Manifest) map[string]string {
+	resourceChartMap := make(map[string]string, 0)
+	for i := range hs {
+		childChartName := getChildChartName(hs[i].Path)
+		if childChartName == "" {
+			continue
+		}
+		resourceChartMap[fmt.Sprintf("%s:%s", hs[i].Kind, hs[i].Name)] = childChartName
+	}
+	for i := range manifests {
+		childChartName := getChildChartName(manifests[i].Name)
+		if childChartName == "" {
+			continue
+		}
+		resourceChartMap[fmt.Sprintf("%s:%s", manifests[i].Head.Kind, manifests[i].Head.Metadata.Name)] = childChartName
+	}
+	return resourceChartMap
+}
+
+func getChildChartName(path string) string {
+	pathParts := strings.Split(path, "/")
+	if pathParts == nil || len(pathParts) < 2 {
+		return ""
+	}
+	if pathParts[1] == "chart" {
+		return pathParts[2]
+	}
+	return pathParts[0]
 }
 
 // write the <data> to <output-dir>/<name>. <append> controls if the file is created or content will be appended
