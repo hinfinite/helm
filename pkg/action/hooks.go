@@ -61,7 +61,7 @@ func (cfg *Configuration) execHook(rl *release.Release,
 	for k, _ := range hookGroupByWeight {
 		keys = append(keys, k)
 	}
-	sort.IntsAreSorted(keys)
+	sort.Ints(keys)
 	for _, v := range keys {
 		if err := cfg.executeHookByWeight(
 			hookGroupByWeight[v],
