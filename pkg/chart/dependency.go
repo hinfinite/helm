@@ -47,6 +47,10 @@ type Dependency struct {
 	ImportValues []interface{} `json:"import-values,omitempty"`
 	// Alias usable alias to be used for the chart
 	Alias string `json:"alias,omitempty"`
+    // Repository username
+	Username string `json:"username,omitempty"`
+	// Repository password
+	Password string `json:"password,omitempty"`
 }
 
 // Lock is a lock file for dependencies.
