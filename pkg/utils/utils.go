@@ -55,6 +55,12 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 	return o.run(os.Stdout)
 }
 
+func RepoUpdate() error {
+	o := &repoUpdateOptions{update: updateCharts}
+	o.repoFile = settings.RepositoryConfig
+	return o.run(os.Stdout)
+}
+
 type ChartSummary struct {
 	Name string `json:"name,omitempty"`
 	// A SemVer 2 conformant version string of the chart
