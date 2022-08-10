@@ -81,7 +81,7 @@ func (o *SearchRepoOptions) applyConstraint(res []*search.Result) ([]*search.Res
 		return res, nil
 	}
 
-	constraint, err := semver.NewConstraint(o.version)
+	_, err := semver.NewConstraint(o.version)
 	if err != nil {
 		return res, errors.Wrap(err, "an invalid version/constraint format")
 	}
@@ -92,12 +92,9 @@ func (o *SearchRepoOptions) applyConstraint(res []*search.Result) ([]*search.Res
 		if _, found := foundNames[r.Name]; found {
 			continue
 		}
-		v, err := semver.NewVersion(r.Chart.Version)
-		if err != nil || constraint.Check(v) {
-			data = append(data, r)
-			if !o.versions {
-				foundNames[r.Name] = true // If user hasn't requested all versions, only show the latest that matches
-			}
+		data = append(data, r)
+		if !o.versions {
+			foundNames[r.Name] = true // If user hasn't requested all versions, only show the latest that matches
 		}
 	}
 
