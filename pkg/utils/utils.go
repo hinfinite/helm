@@ -35,7 +35,7 @@ type RepoConfig struct {
 	Url      string
 	Username string
 	Password string
-	noUpdate bool
+	NoUpdate bool
 }
 
 // AddRepo add repo
@@ -49,7 +49,7 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 		url:                   repoConfig.Url,
 		username:              repoConfig.Username,
 		password:              repoConfig.Password,
-		noUpdate:              repoConfig.noUpdate,
+		noUpdate:              repoConfig.NoUpdate,
 		insecureSkipTLSverify: false,
 		settings:              settings,
 	}
