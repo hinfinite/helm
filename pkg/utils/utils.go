@@ -18,12 +18,13 @@ package utils
 
 import (
 	"fmt"
-	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/golang/glog"
 
 	"github.com/hinfinite/helm/pkg/action"
 	"github.com/hinfinite/helm/pkg/chart"
@@ -54,7 +55,7 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 		username:              repoConfig.Username,
 		password:              repoConfig.Password,
 		noUpdate:              repoConfig.NoUpdate,
-		insecureSkipTLSverify: false,
+		insecureSkipTLSverify: true,
 		settings:              settings,
 	}
 	return o.run(os.Stdout)
