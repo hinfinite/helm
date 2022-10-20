@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
 	v1 "k8s.io/api/core/v1"
@@ -26,34 +27,56 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	t := info.Object.(*unstructured.Unstructured)
 	kind := info.Mapping.GroupVersionKind.Kind
 
-	l := t.GetLabels()
+	// 添加公共标签逻辑
+	var addBaseLabels = func(labels map[string]string) {
+		if labels == nil {
+			return
+		}
+		labels[model.ResourceCluster] = clusterCode
+		labels[model.AgentVersionLabel] = agentVersion
+		labels[model.ReleaseLabel] = releaseName
+		labels[model.CommitLabel] = commit
 
-	if l == nil {
-		l = make(map[string]string)
+	}
+	var addAppLabels = func(labels map[string]string) {
+		if labels == nil {
+			return
+		}
+		labels[model.AppLabel] = chartName
+		labels[model.AppVersionLabel] = version
 	}
 
-	var addBaseLabels = func() {
-		l[model.ReleaseLabel] = releaseName
-		l[model.AgentVersionLabel] = agentVersion
-		l[model.CommitLabel] = commit
-		l[model.ResourceCluster] = clusterCode
-	}
-	var addAppLabels = func() {
-		l[model.AppLabel] = chartName
-		l[model.AppVersionLabel] = version
-	}
-
-	var addTemplateAppLabels = func(workloadKind, workloadName string) {
+	// 获取并添加工作负载标签
+	var fetchAndAddWorkloadTemplateLabels = func(workloadKind, workloadName string) map[string]string {
 		tplLabels := getTemplateLabels(t.Object)
-		tplLabels[model.ReleaseLabel] = releaseName
-		tplLabels[model.AgentVersionLabel] = agentVersion
-		tplLabels[model.CommitLabel] = commit
+		if tplLabels == nil {
+			tplLabels = make(map[string]string)
+		}
+
+		// Base Labels
+		addBaseLabels(tplLabels)
+
+		// App Labels
+		addAppLabels(tplLabels)
+
+		// Workload Labels
 		tplLabels[model.ParentWorkloadLabel] = workloadKind
 		tplLabels[model.ParentWorkloadNameLabel] = workloadName
 
-		tplLabels[model.AppLabel] = chartName
-		tplLabels[model.AppVersionLabel] = version
+		return tplLabels
+	}
+
+	var addTemplateAppLabels = func(workloadKind, workloadName string) {
+		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
+
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
+			glog.Warningf("Set Template Labels failed, %v", err)
+		}
+	}
+	var addCronJobTemplateAppLabels = func(workloadKind, workloadName string) {
+		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
+
+		if err := setCronJobPodTemplateLabels(t.Object, tplLabels); err != nil {
 			glog.Warningf("Set Template Labels failed, %v", err)
 		}
 	}
@@ -96,10 +119,9 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
-		addAppLabels()
+		addImagePullSecrets()
 		addTemplateAppLabels(kind, t.GetName())
 		addSelectorAppLabels()
-		addImagePullSecrets()
 		if isUpgrade {
 			if kind == "ReplicaSet" {
 				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(t.GetName(), metav1.GetOptions{})
@@ -132,31 +154,15 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 				}
 			}
 		}
-	case "ConfigMap":
-	case "Service":
-	case "Ingress":
 	case "Job":
 		addImagePullSecrets()
-		tplLabels := getTemplateLabels(t.Object)
-		tplLabels[model.ReleaseLabel] = releaseName
-		tplLabels[model.CommitLabel] = commit
-		tplLabels[model.ParentWorkloadLabel] = kind
-		tplLabels[model.ParentWorkloadNameLabel] = t.GetName()
-		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
-			glog.Warningf("Set Test-Template Labels failed, %v", err)
-		}
-	case "CronJob":
-		tplLabels := getTemplateLabels(t.Object)
-		tplLabels[model.CommitLabel] = commit
-		tplLabels[model.ParentWorkloadLabel] = kind
-		tplLabels[model.ParentWorkloadNameLabel] = t.GetName()
-		if err := setCronJobPodTemplateLabels(t.Object, tplLabels); err != nil {
-			glog.Warningf("Set Template Labels failed, %v", err)
-		}
-	case "DaemonSet", "StatefulSet":
-		addAppLabels()
 		addTemplateAppLabels(kind, t.GetName())
+	case "CronJob":
 		addImagePullSecrets()
+		addCronJobTemplateAppLabels(kind, t.GetName())
+	case "DaemonSet", "StatefulSet":
+		addImagePullSecrets()
+		addTemplateAppLabels(kind, t.GetName())
 		if isUpgrade {
 			if kind == "StatefulSet" {
 				sts, err := clientSet.AppsV1().StatefulSets(namespace).Get(t.GetName(), metav1.GetOptions{})
@@ -174,18 +180,27 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 				}
 			}
 		}
+	case "ConfigMap":
+	case "Service":
+	case "Ingress":
 	case "Secret":
-		addAppLabels()
 	case "Pod":
-		addAppLabels()
 	default:
-		addAppLabels()
 	}
 	if t.GetNamespace() != "" && t.GetNamespace() != namespace {
 		return fmt.Errorf(" Kind:%s Name:%s. The namespace of this resource is not consistent with helm release", kind, t.GetName())
 	}
-	// add base labels
-	addBaseLabels()
+
+	// Add base and app labels
+	l := t.GetLabels()
+
+	if l == nil {
+		l = make(map[string]string)
+	}
+
+	addBaseLabels(l)
+	addAppLabels(l)
+
 	t.SetLabels(l)
 	return nil
 }
