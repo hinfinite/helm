@@ -111,6 +111,9 @@ func atomicWriteFile(filename string, body io.Reader, mode os.FileMode) error {
 // Returns a string path to the location where the file was downloaded and a verification
 // (if provenance was verified), or an error if something bad happened.
 func (c *ChartDownloader) DownloadTo(ref, version, dest string) (string, *provenance.Verification, error) {
+	// added by allen.liu @2022-10-20 for tls repo
+	c.Options = append(c.Options, getter.WithInsecureSkipVerifyTLS(true))
+
 	u, err := c.ResolveChartVersion(ref, version)
 	if err != nil {
 		return "", nil, err
@@ -175,6 +178,9 @@ func (c *ChartDownloader) DownloadTo(ref, version, dest string) (string, *proven
 //		* If version is empty, this will return the URL for the latest version
 //		* If no version can be found, an error is returned
 func (c *ChartDownloader) ResolveChartVersion(ref, version string) (*url.URL, error) {
+	// added by allen.liu @2022-10-20 for tls repo
+	c.Options = append(c.Options, getter.WithInsecureSkipVerifyTLS(true))
+
 	u, err := url.Parse(ref)
 	if err != nil {
 		return nil, errors.Errorf("invalid chart URL format: %s", ref)
@@ -409,6 +415,9 @@ func loadRepoConfig(file string) (*repo.File, error) {
 // @date: 2022-03-30
 // @author: allen
 func (c *ChartDownloader) DownloadToChart(ref string, version string) (*chart.Chart, error) {
+	// added by allen.liu @2022-10-20 for tls repo
+	c.Options = append(c.Options, getter.WithInsecureSkipVerifyTLS(true))
+
 	u, err := c.ResolveChartVersion(ref, version)
 	if err != nil {
 		return nil, err
