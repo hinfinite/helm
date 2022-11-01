@@ -81,6 +81,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	var addTemplateAppLabels = func(workloadKind, workloadName string) {
 		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
+		// 按需添加自定义标签到标签选择器标签选择器
+		tplLabels = addCustomLabelIfNotPresent(tplLabels)
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
 			glog.Warningf("Set Template Labels failed, %v", err)
 		}
