@@ -23,7 +23,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	agentVersion,
 	namespace string,
 	isUpgrade bool,
-	clientSet *kubernetes.Clientset) error {
+	clientSet *kubernetes.Clientset,
+	customLabel map[string]string) error {
 	t := info.Object.(*unstructured.Unstructured)
 	kind := info.Mapping.GroupVersionKind.Kind
 
@@ -44,6 +45,18 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		labels[model.AppLabel] = chartName
 		labels[model.AppVersionLabel] = version
+	}
+	//按需添加自定义标签
+	var addCustomLabelIfNotPresent = func(labels map[string]string) map[string]string {
+		if customLabel == nil {
+			return labels
+		}
+		for key, val := range customLabel {
+			if _, ok := labels[key]; !ok {
+				labels[key] = val
+			}
+		}
+		return labels
 	}
 
 	// 获取并添加工作负载标签
@@ -68,11 +81,11 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	var addTemplateAppLabels = func(workloadKind, workloadName string) {
 		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
-
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
 			glog.Warningf("Set Template Labels failed, %v", err)
 		}
 	}
+
 	var addCronJobTemplateAppLabels = func(workloadKind, workloadName string) {
 		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
 
@@ -89,6 +102,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			selectorLabels = make(map[string]string)
 		}
 		selectorLabels[model.ReleaseLabel] = releaseName
+		// 按需添加自定义标签到标签选择器标签选择器
+		addCustomLabelIfNotPresent(selectorLabels)
 		if err := unstructured.SetNestedStringMap(t.Object, selectorLabels, "spec", "selector", "matchLabels"); err != nil {
 			glog.Warningf("Set Selector label failed, %v", err)
 		}
@@ -200,6 +215,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	addBaseLabels(l)
 	addAppLabels(l)
+	addCustomLabelIfNotPresent(l)
 
 	t.SetLabels(l)
 	return nil

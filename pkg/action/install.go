@@ -280,7 +280,8 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 
 	// 在这里对要创建的对象添加标签
 	for _, r := range resources {
-		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil)
+		customLabel := rel.GetCharCustomLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabel)
 		if err != nil {
 			return nil, err
 		}
