@@ -231,7 +231,8 @@ func doExecuteHook(cfg *Configuration,
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range resources {
 			customLabel := rl.GetCharCustomLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabel)
+			customSelectorLabel := rl.GetCharCustomSelectorLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabel, customSelectorLabel)
 			if err != nil {
 				return nil, err
 			}

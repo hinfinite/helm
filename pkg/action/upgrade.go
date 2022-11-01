@@ -250,7 +250,8 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range target {
 			customLabel := upgradedRelease.GetCharCustomLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabel)
+			customSelectorLabel := upgradedRelease.GetCharCustomSelectorLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabel, customSelectorLabel)
 			if err != nil {
 				return nil, err
 			}

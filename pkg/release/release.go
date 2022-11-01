@@ -46,8 +46,10 @@ type Release struct {
 	Namespace string `json:"namespace,omitempty"`
 	// 资源对应的chart名称
 	ResourceChartMap map[string]string `json:"resource_chart_map,omitempty"`
-	// 自定义资源，k1=charName v1=标签
+	// 自定义标签，k1=charName v1=标签
 	CustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	// 自定义标签，k1=charName v1=标签
+	CustomSelectorLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
 }
 
 // SetStatus is a helper for setting the status on a release.
@@ -60,7 +62,7 @@ func (r *Release) SetStatus(status Status, msg string) {
 func (r *Release) GetCharCustomLabelBasisOnResource(kind string, name string) map[string]string {
 	result := make(map[string]string)
 	if r.CustomLabelMap == nil {
-		r.parseCustomLabel()
+		r.CustomLabelMap = r.parseCustomLabel("hskp_devops_custom_label")
 	}
 	if r.ResourceChartMap == nil {
 		glog.Info("ResourceChartMap空，无法获取自定义标签 ")
@@ -75,12 +77,31 @@ func (r *Release) GetCharCustomLabelBasisOnResource(kind string, name string) ma
 	return result
 }
 
-func (r *Release) parseCustomLabel() {
-	r.CustomLabelMap = make(map[string]map[string]string)
+//基于资源类型和名称获取对应char的自定义标签
+func (r *Release) GetCharCustomSelectorLabelBasisOnResource(kind string, name string) map[string]string {
+	result := make(map[string]string)
+	if r.CustomSelectorLabelMap == nil {
+		r.CustomSelectorLabelMap = r.parseCustomLabel("hskp_devops_custom_selector_label")
+	}
+	if r.ResourceChartMap == nil {
+		glog.Info("ResourceChartMap空，无法获取自定义标签 ")
+		return result
+	}
+	resourceChartKey := fmt.Sprintf("%s:%s", kind, name)
+	if charName, ok := r.ResourceChartMap[resourceChartKey]; ok {
+		if customSelectorLabel, ok := r.CustomSelectorLabelMap[charName]; ok {
+			result = customSelectorLabel
+		}
+	}
+	return result
+}
+
+func (r *Release) parseCustomLabel(labelType string) map[string]map[string]string {
+	customLabelMap := make(map[string]map[string]string)
 	v, err := copystructure.Copy(r.Config)
 
 	if err != nil {
-		return
+		return customLabelMap
 	}
 
 	valsCopy := v.(map[string]interface{})
@@ -90,7 +111,7 @@ func (r *Release) parseCustomLabel() {
 
 	if global, ok := valsCopy["global"]; ok {
 		globalValue := global.(map[string]interface{})
-		if customLabel, ok := globalValue["hskp_devops_custom_label"]; ok {
+		if customLabel, ok := globalValue[labelType]; ok {
 			customLabelValues := customLabel.(map[string]interface{})
 			for charName, charLabelsValue := range customLabelValues {
 				if charLabelsValue == nil {
@@ -100,8 +121,11 @@ func (r *Release) parseCustomLabel() {
 				for key, val := range charLabelsValue.(map[string]interface{}) {
 					charLabels[key] = fmt.Sprintf("%v", val)
 				}
-				r.CustomLabelMap[charName] = charLabels
+				customLabelMap[charName] = charLabels
 			}
 		}
 	}
+
+	return customLabelMap
+
 }
