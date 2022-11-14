@@ -23,7 +23,7 @@ require (
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0
-	github.com/evanphx/json-patch v4.5.0+incompatible
+	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/flock v0.7.1
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
@@ -32,13 +32,11 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gosuri/uitable v0.0.4
 	github.com/mattn/go-shellwords v1.0.10
-	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/mitchellh/copystructure v1.0.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.0.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
@@ -49,11 +47,11 @@ require (
 	gorm.io/gorm v1.23.5
 	gotest.tools/v3 v3.1.0 // indirect
 	helm.sh/helm/v3 v3.1.2
-	k8s.io/api v0.17.3
+	k8s.io/api v0.21.2
 	k8s.io/apiextensions-apiserver v0.17.3
-	k8s.io/apimachinery v0.17.3
-	k8s.io/cli-runtime v0.17.3
-	k8s.io/client-go v0.17.3
+	k8s.io/apimachinery v0.21.2
+	k8s.io/cli-runtime v0.21.2
+	k8s.io/client-go v0.21.2
 	k8s.io/klog v1.0.0
 	k8s.io/kubectl v0.17.3
 	sigs.k8s.io/yaml v1.2.0
@@ -90,12 +88,16 @@ replace (
 	github.com/xeipuuv/gojsonschema => github.com/xeipuuv/gojsonschema v1.1.0
 	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20200414173820-0848c9571904
 	helm.sh/helm/v3 => helm.sh/helm/v3 v3.1.2
-	k8s.io/api => k8s.io/api v0.17.3
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.17.3
-	k8s.io/apimachinery => k8s.io/apimachinery v0.17.3
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.17.3
-	k8s.io/client-go => k8s.io/client-go v0.17.3
 	k8s.io/klog => k8s.io/klog v1.0.0
-	k8s.io/kubectl => k8s.io/kubectl v0.17.3
 	sigs.k8s.io/yaml => sigs.k8s.io/yaml v1.1.0
+)
+
+// New
+replace (
+	k8s.io/api => k8s.io/api v0.21.2
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.2
+	k8s.io/apimachinery => k8s.io/apimachinery v0.21.2
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.21.2
+	k8s.io/client-go => k8s.io/client-go v0.21.2
+	k8s.io/kubectl => k8s.io/kubectl v0.21.2
 )

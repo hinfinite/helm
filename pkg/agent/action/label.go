@@ -1,6 +1,7 @@
 package action
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/golang/glog"
@@ -142,7 +143,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		addSelectorAppLabels()
 		if isUpgrade {
 			if kind == "ReplicaSet" {
-				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(t.GetName(), metav1.GetOptions{})
+				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(context.TODO(), t.GetName(), metav1.GetOptions{})
 				if errors.IsNotFound(err) {
 					break
 				}
@@ -157,7 +158,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 				}
 			}
 			if kind == "Deployment" {
-				dp, err := clientSet.AppsV1().Deployments(namespace).Get(t.GetName(), metav1.GetOptions{})
+				dp, err := clientSet.AppsV1().Deployments(namespace).Get(context.TODO(), t.GetName(), metav1.GetOptions{})
 				if errors.IsNotFound(err) {
 					break
 				}
@@ -183,7 +184,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		addTemplateAppLabels(kind, t.GetName())
 		if isUpgrade {
 			if kind == "StatefulSet" {
-				sts, err := clientSet.AppsV1().StatefulSets(namespace).Get(t.GetName(), metav1.GetOptions{})
+				sts, err := clientSet.AppsV1().StatefulSets(namespace).Get(context.TODO(), t.GetName(), metav1.GetOptions{})
 				if errors.IsNotFound(err) {
 					break
 				}

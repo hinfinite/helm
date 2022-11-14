@@ -23,7 +23,7 @@ import (
 )
 
 func TestShow(t *testing.T) {
-	client := NewShow(nil, ShowAll,ChartPathOptions{})
+	client := NewShow(nil, ShowAll, ChartPathOptions{})
 
 	output, err := client.Run("../../cmd/helm/testdata/testcharts/alpine", nil)
 	if err != nil {
@@ -65,7 +65,7 @@ func TestShow(t *testing.T) {
 
 	// Regression tests for missing values. See issue #1024.
 	client.OutputFormat = ShowValues
-	output, err = client.Run("../../cmd/helm/testdata/testcharts/novals")
+	output, err = client.Run("../../cmd/helm/testdata/testcharts/novals", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

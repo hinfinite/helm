@@ -170,7 +170,8 @@ func (c *Client) Update(original, target ResourceList, force bool) (*Result, err
 		}
 
 		helper := resource.NewHelper(info.Client, info.Mapping)
-		if _, err := helper.Get(info.Namespace, info.Name, info.Export); err != nil {
+		// Update by allen 2022-11-14
+		if _, err := helper.Get(info.Namespace, info.Name); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return errors.Wrap(err, "could not get information about the resource")
 			}
@@ -339,7 +340,8 @@ func batchPerform(infos ResourceList, fn func(*resource.Info) error, errs chan<-
 }
 
 func createResource(info *resource.Info) error {
-	obj, err := resource.NewHelper(info.Client, info.Mapping).Create(info.Namespace, true, info.Object, nil)
+	// Updated by allen 2022-11-14
+	obj, err := resource.NewHelper(info.Client, info.Mapping).Create(info.Namespace, true, info.Object)
 	if err != nil {
 		return err
 	}
@@ -365,7 +367,8 @@ func createPatch(target *resource.Info, current runtime.Object) ([]byte, types.P
 
 	// Fetch the current object for the three way merge
 	helper := resource.NewHelper(target.Client, target.Mapping)
-	currentObj, err := helper.Get(target.Namespace, target.Name, target.Export)
+	// Updated by allen 2022-11-14
+	currentObj, err := helper.Get(target.Namespace, target.Name)
 	if err != nil && !apierrors.IsNotFound(err) {
 		return nil, types.StrategicMergePatchType, errors.Wrapf(err, "unable to get data for current object %s/%s", target.Namespace, target.Name)
 	}
@@ -470,7 +473,8 @@ func (c *Client) watchUntilReady(timeout time.Duration, info *resource.Info) err
 
 	ctx, cancel := watchtools.ContextWithOptionalTimeout(context.Background(), timeout)
 	defer cancel()
-	_, err = watchtools.ListWatchUntil(ctx, lw, func(e watch.Event) (bool, error) {
+	// Updated by allen 2022-11-14
+	_, err = watchtools.Until(ctx, "1", lw, func(e watch.Event) (bool, error) {
 		// Make sure the incoming object is versioned as we use unstructured
 		// objects when we build manifests
 		obj := convertWithMapper(e.Object, info.Mapping)
@@ -565,7 +569,7 @@ func scrubValidationError(err error) error {
 func (c *Client) WaitAndGetCompletedPodPhase(name string, timeout time.Duration) (v1.PodPhase, error) {
 	client, _ := c.Factory.KubernetesClientSet()
 	to := int64(timeout)
-	watcher, err := client.CoreV1().Pods(c.namespace()).Watch(metav1.ListOptions{
+	watcher, err := client.CoreV1().Pods(c.namespace()).Watch(context.TODO(), metav1.ListOptions{
 		FieldSelector:  fmt.Sprintf("metadata.name=%s", name),
 		TimeoutSeconds: &to,
 	})
