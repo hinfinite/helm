@@ -18,6 +18,7 @@ package chartutil
 
 import (
 	"fmt"
+	"github.com/mitchellh/copystructure"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -163,6 +164,38 @@ func ToRenderValues(chrt *chart.Chart, chrtVals map[string]interface{}, options 
 
 	top["Values"] = vals
 	return top, nil
+}
+func ParseCustomLabel(vals map[string]interface{}) map[string]map[string]string {
+	customLabels := make(map[string]map[string]string)
+	v, err := copystructure.Copy(vals)
+
+	if err != nil {
+		return customLabels
+	}
+
+	valsCopy := v.(map[string]interface{})
+	if valsCopy == nil {
+		valsCopy = make(map[string]interface{})
+	}
+
+	if global, ok := valsCopy["global"]; ok {
+		globalValue := global.(map[string]interface{})
+		if customLabel, ok := globalValue["hskp_devops_custom_label"]; ok {
+			customLabelValues := customLabel.(map[string]interface{})
+			for charName, charLabelsValue := range customLabelValues {
+				if charLabelsValue == nil {
+					continue
+				}
+				charLabels := make(map[string]string)
+				for key, val := range charLabelsValue.(map[string]interface{}) {
+					charLabels[key] = fmt.Sprintf("%v", val)
+				}
+				customLabels[charName] = charLabels
+			}
+		}
+	}
+
+	return customLabels
 }
 
 // istable is a special-purpose function to see if the present thing matches the definition of a YAML table.

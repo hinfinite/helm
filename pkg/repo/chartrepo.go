@@ -132,7 +132,9 @@ func (r *ChartRepository) DownloadIndexFile() (*IndexFile, string, error) {
 	// TODO add user-agent
 	resp, err := r.Client.Get(indexURL,
 		getter.WithURL(r.Config.URL),
-		getter.WithInsecureSkipVerifyTLS(r.Config.InsecureSkipTLSverify),
+		// Fixed by allen.liu @2022-10-20 for ignoring the verify
+		// getter.WithInsecureSkipVerifyTLS(r.Config.InsecureSkipTLSverify),
+		getter.WithInsecureSkipVerifyTLS(true),
 		getter.WithTLSClientConfig(r.Config.CertFile, r.Config.KeyFile, r.Config.CAFile),
 		getter.WithBasicAuth(r.Config.Username, r.Config.Password),
 	)
