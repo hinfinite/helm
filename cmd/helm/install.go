@@ -104,7 +104,7 @@ charts in a repository, use 'helm search'.
 `
 
 func newInstallCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
-	client := action.NewInstall(cfg, action.ChartPathOptions{}, "", nil, "", "", "", "", "", "")
+	client := action.NewInstall(cfg, action.ChartPathOptions{}, "", nil, "", "", "", "", "", "", nil)
 	valueOpts := &values.Options{}
 	var outfmt output.Format
 

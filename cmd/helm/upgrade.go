@@ -100,7 +100,7 @@ func newUpgradeCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 					if outfmt == output.Table {
 						fmt.Fprintf(out, "Release %q does not exist. Installing it now.\n", args[0])
 					}
-					instClient := action.NewInstall(cfg, action.ChartPathOptions{}, "",nil, "", "", "", "", "", "")
+					instClient := action.NewInstall(cfg, action.ChartPathOptions{}, "",nil, "", "", "", "", "", "", nil)
 					instClient.CreateNamespace = createNamespace
 					instClient.ChartPathOptions = client.ChartPathOptions
 					instClient.DryRun = client.DryRun
