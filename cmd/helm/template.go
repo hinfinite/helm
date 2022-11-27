@@ -45,7 +45,7 @@ faked locally. Additionally, none of the server-side testing of chart validity
 func newTemplateCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 	var validate bool
 	var includeCrds bool
-	client := action.NewInstall(cfg, action.ChartPathOptions{}, "", nil, "", "", "", "", "", "")
+	client := action.NewInstall(cfg, action.ChartPathOptions{}, "", nil, "", "", "", "", "", "", nil)
 	valueOpts := &values.Options{}
 	var extraAPIs []string
 	var showFiles []string

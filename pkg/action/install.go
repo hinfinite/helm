@@ -110,6 +110,7 @@ type Install struct {
 	ChartVersion    string
 	ClusterCode     string
 	AgentVersion    string
+	DoCallbackReleaseHandler func(*release.Release)
 }
 
 // ChartPathOptions captures common options used for controlling chart paths
@@ -135,7 +136,8 @@ func NewInstall(cfg *Configuration,
 	chartName string,
 	chartVersion string,
 	clusterCode string,
-	agentVersion string) *Install {
+	agentVersion string,
+	doCallbackReleaseHandler func(*release.Release)) *Install {
 	return &Install{
 		ChartPathOptions: chartPathOptions,
 		cfg:              cfg,
@@ -148,6 +150,7 @@ func NewInstall(cfg *Configuration,
 		ClusterCode:      clusterCode,
 		AgentVersion:     agentVersion,
 		CreateNamespace:  true,
+		DoCallbackReleaseHandler: doCallbackReleaseHandler,
 	}
 }
 
@@ -313,6 +316,10 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 	if i.DryRun {
 		rel.Info.Description = "Dry run complete"
 		return rel, nil
+	}
+
+	if i.DoCallbackReleaseHandler != nil {
+		i.DoCallbackReleaseHandler(rel)
 	}
 
 	if i.CreateNamespace {
