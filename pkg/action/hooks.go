@@ -230,9 +230,10 @@ func doExecuteHook(cfg *Configuration,
 	if chartName != "hskp-devops-cluster-agent" {
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range resources {
-			customLabel := rl.GetCharCustomLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			customSelectorLabel := rl.GetCharCustomSelectorLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabel, customSelectorLabel)
+			customLabelOnChart := rl.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customSelectorLabelOnChart := rl.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customLabelOnResource := rl.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
 			if err != nil {
 				return nil, err
 			}

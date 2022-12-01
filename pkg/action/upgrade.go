@@ -249,9 +249,10 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 	if u.ChartName != "hskp-devops-cluster-agent" {
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range target {
-			customLabel := upgradedRelease.GetCharCustomLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			customSelectorLabel := upgradedRelease.GetCharCustomSelectorLabelBasisOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabel, customSelectorLabel)
+			customLabelOnChart := upgradedRelease.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customSelectorLabelOnChart := upgradedRelease.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customLabelOnResource := upgradedRelease.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
 			if err != nil {
 				return nil, err
 			}

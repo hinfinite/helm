@@ -24,8 +24,9 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	namespace string,
 	isUpgrade bool,
 	clientSet *kubernetes.Clientset,
-	customLabel map[string]string,
-	customSelectorLabel map[string]string) error {
+	customLabelOnChart map[string]string,
+	customSelectorLabelOnChart map[string]string,
+	customLabelOnResource map[string]string) error {
 	t := info.Object.(*unstructured.Unstructured)
 	kind := info.Mapping.GroupVersionKind.Kind
 
@@ -82,8 +83,9 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	var addTemplateAppLabels = func(workloadKind, workloadName string) {
 		tplLabels := fetchAndAddWorkloadTemplateLabels(workloadKind, workloadName)
-		// 按需添加自定义标签到标签选择器标签选择器
-		tplLabels = addCustomLabelIfNotPresent(customLabel, tplLabels)
+		// 按需添加自定义标签到标签选择器标签选择器,优先资源维度，其次chart维度
+		tplLabels = addCustomLabelIfNotPresent(customLabelOnResource, tplLabels)
+		tplLabels = addCustomLabelIfNotPresent(customLabelOnChart, tplLabels)
 		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
 			glog.Warningf("Set Template Labels failed, %v", err)
 		}
@@ -105,10 +107,19 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			selectorLabels = make(map[string]string)
 		}
 		selectorLabels[model.ReleaseLabel] = releaseName
-		// 按需添加自定义标签到标签选择器标签选择器
-		addCustomLabelIfNotPresent(customSelectorLabel, selectorLabels)
+		// 按需添加自定义选择器标签到selector
+		addCustomLabelIfNotPresent(customSelectorLabelOnChart, selectorLabels)
 		if err := unstructured.SetNestedStringMap(t.Object, selectorLabels, "spec", "selector", "matchLabels"); err != nil {
 			glog.Warningf("Set Selector label failed, %v", err)
+		}
+		// 按需添加自定义选择器标签到template
+		tplLabels := getTemplateLabels(t.Object)
+		if tplLabels == nil {
+			tplLabels = make(map[string]string)
+		}
+		addCustomLabelIfNotPresent(customSelectorLabelOnChart, tplLabels)
+		if err := setTemplateLabels(t.Object, tplLabels); err != nil {
+			glog.Warningf("Set Template Labels failed, %v", err)
 		}
 	}
 
@@ -138,8 +149,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
 		addImagePullSecrets()
-		addTemplateAppLabels(kind, t.GetName())
 		addSelectorAppLabels()
+		addTemplateAppLabels(kind, t.GetName())
 		if isUpgrade {
 			if kind == "ReplicaSet" {
 				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(t.GetName(), metav1.GetOptions{})
@@ -218,7 +229,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	addBaseLabels(l)
 	addAppLabels(l)
-	addCustomLabelIfNotPresent(customLabel, l)
+	addCustomLabelIfNotPresent(customLabelOnChart, l)
 
 	t.SetLabels(l)
 	return nil

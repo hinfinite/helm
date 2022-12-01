@@ -44,12 +44,15 @@ type Release struct {
 	Version int `json:"version,omitempty"`
 	// Namespace is the kubernetes namespace of the release.
 	Namespace string `json:"namespace,omitempty"`
-	// 资源对应的chart名称
+
+	// 资源对应的chart名称 k=kind:name v=chart名称
 	ResourceChartMap map[string]string `json:"resource_chart_map,omitempty"`
-	// 自定义标签，k1=charName v1=标签
-	CustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
-	// 自定义标签，k1=charName v1=标签
-	CustomSelectorLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	// chart维度自定义标签，k=charName v=自定义标签
+	ChartCustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	// chart维度自定义标签选择器，k=charName v=自定义标签
+	ChartCustomSelectorLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	// resource维度自定义标签，k=kind_name v=自定义标签
+	ResourceCustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
 }
 
 // SetStatus is a helper for setting the status on a release.
@@ -58,11 +61,11 @@ func (r *Release) SetStatus(status Status, msg string) {
 	r.Info.Description = msg
 }
 
-//基于资源类型和名称获取对应char的自定义标签
-func (r *Release) GetCharCustomLabelBasisOnResource(kind string, name string) map[string]string {
+//基于资源类型和名称获取chart维度的自定义标签
+func (r *Release) GetCustomLabelOnChart(kind string, name string) map[string]string {
 	result := make(map[string]string)
-	if r.CustomLabelMap == nil {
-		r.CustomLabelMap = r.parseCustomLabel("hskp_devops_custom_label")
+	if r.ChartCustomLabelMap == nil {
+		r.ChartCustomLabelMap = r.parseCustomLabel("hskp_devops_custom_label")
 	}
 	if r.ResourceChartMap == nil {
 		glog.Info("ResourceChartMap空，无法获取自定义标签 ")
@@ -70,18 +73,18 @@ func (r *Release) GetCharCustomLabelBasisOnResource(kind string, name string) ma
 	}
 	resourceChartKey := fmt.Sprintf("%s:%s", kind, name)
 	if charName, ok := r.ResourceChartMap[resourceChartKey]; ok {
-		if charCustomLabel, ok := r.CustomLabelMap[charName]; ok {
+		if charCustomLabel, ok := r.ChartCustomLabelMap[charName]; ok {
 			result = charCustomLabel
 		}
 	}
 	return result
 }
 
-//基于资源类型和名称获取对应char的自定义标签
-func (r *Release) GetCharCustomSelectorLabelBasisOnResource(kind string, name string) map[string]string {
+//基于资源类型和名称获取chart维度的自定义标签选择器
+func (r *Release) GetCustomSelectorLabelOnChar(kind string, name string) map[string]string {
 	result := make(map[string]string)
-	if r.CustomSelectorLabelMap == nil {
-		r.CustomSelectorLabelMap = r.parseCustomLabel("hskp_devops_custom_selector_label")
+	if r.ChartCustomSelectorLabelMap == nil {
+		r.ChartCustomSelectorLabelMap = r.parseCustomLabel("hskp_devops_custom_selector_label")
 	}
 	if r.ResourceChartMap == nil {
 		glog.Info("ResourceChartMap空，无法获取自定义标签 ")
@@ -89,9 +92,23 @@ func (r *Release) GetCharCustomSelectorLabelBasisOnResource(kind string, name st
 	}
 	resourceChartKey := fmt.Sprintf("%s:%s", kind, name)
 	if charName, ok := r.ResourceChartMap[resourceChartKey]; ok {
-		if customSelectorLabel, ok := r.CustomSelectorLabelMap[charName]; ok {
+		if customSelectorLabel, ok := r.ChartCustomSelectorLabelMap[charName]; ok {
 			result = customSelectorLabel
 		}
+	}
+	return result
+}
+
+//基于资源类型和名称获取资源维度的自定义标签
+func (r *Release) GetCustomLabelOnResource(kind string, name string) map[string]string {
+	result := make(map[string]string)
+	if r.ChartCustomSelectorLabelMap == nil {
+		r.ChartCustomSelectorLabelMap = r.parseCustomLabel("hskp_devops_resource_custom_label")
+	}
+
+	resourceKey := fmt.Sprintf("%s_%s", kind, name)
+	if targetResourceCustomLabel, ok := r.ChartCustomSelectorLabelMap[resourceKey]; ok {
+		result = targetResourceCustomLabel
 	}
 	return result
 }
