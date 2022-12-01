@@ -102,12 +102,12 @@ func (r *Release) GetCustomSelectorLabelOnChar(kind string, name string) map[str
 //基于资源类型和名称获取资源维度的自定义标签
 func (r *Release) GetCustomLabelOnResource(kind string, name string) map[string]string {
 	result := make(map[string]string)
-	if r.ChartCustomSelectorLabelMap == nil {
-		r.ChartCustomSelectorLabelMap = r.parseCustomLabel("hskp_devops_resource_custom_label")
+	if r.ResourceCustomLabelMap == nil {
+		r.ResourceCustomLabelMap = r.parseCustomLabel("hskp_devops_resource_custom_label")
 	}
 
 	resourceKey := fmt.Sprintf("%s_%s", kind, name)
-	if targetResourceCustomLabel, ok := r.ChartCustomSelectorLabelMap[resourceKey]; ok {
+	if targetResourceCustomLabel, ok := r.ResourceCustomLabelMap[resourceKey]; ok {
 		result = targetResourceCustomLabel
 	}
 	return result
