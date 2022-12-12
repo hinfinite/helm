@@ -119,6 +119,21 @@ func (c *Client) Wait(resources ResourceList, timeout time.Duration) error {
 	return w.waitForResources(resources)
 }
 
+// WaitWithJobs wait up to the given timeout for the specified resources to be ready, including jobs.
+func (c *Client) WaitWithJobs(resources ResourceList, timeout time.Duration) error {
+	cs, err := c.Factory.KubernetesClientSet()
+	if err != nil {
+		return err
+	}
+	w := waiter{
+		c:       cs,
+		log:     c.Log,
+		timeout: timeout,
+		checkJobs: true,
+	}
+	return w.waitForResources(resources)
+}
+
 func (c *Client) namespace() string {
 	if c.Namespace != "" {
 		return c.Namespace

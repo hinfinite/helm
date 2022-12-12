@@ -60,6 +60,7 @@ type Upgrade struct {
 	SkipCRDs     bool
 	Timeout      time.Duration
 	Wait         bool
+	WaitForJobs              bool
 	DisableHooks bool
 	DryRun       bool
 	Force        bool
@@ -334,9 +335,16 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 	}
 
 	if u.Wait {
-		if err := u.cfg.KubeClient.Wait(target, u.Timeout); err != nil {
-			u.cfg.recordRelease(originalRelease)
-			return u.failRelease(upgradedRelease, results.Created, err)
+		if u.WaitForJobs {
+			if err := u.cfg.KubeClient.WaitWithJobs(target, u.Timeout); err != nil {
+				u.cfg.recordRelease(originalRelease)
+				return u.failRelease(upgradedRelease, results.Created, err)
+			}
+		} else {
+			if err := u.cfg.KubeClient.Wait(target, u.Timeout); err != nil {
+				u.cfg.recordRelease(originalRelease)
+				return u.failRelease(upgradedRelease, results.Created, err)
+			}
 		}
 	}
 

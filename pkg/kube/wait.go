@@ -44,6 +44,7 @@ type waiter struct {
 	c       kubernetes.Interface
 	timeout time.Duration
 	log     func(string, ...interface{})
+	checkJobs bool
 }
 
 // waitForResources polls to get the current status of all pods, PVCs, and Services
@@ -65,6 +66,13 @@ func (w *waiter) waitForResources(created ResourceList) error {
 				pod, err := w.c.CoreV1().Pods(v.Namespace).Get(v.Name, metav1.GetOptions{})
 				if err != nil || !w.isPodReady(pod) {
 					return false, err
+				}
+			case *batchv1.Job:
+				if w.checkJobs {
+					job, err := w.c.BatchV1().Jobs(v.Namespace).Get(v.Name, metav1.GetOptions{})
+					if err != nil || !w.jobReady(job) {
+						return false, err
+					}
 				}
 			case *appsv1.Deployment, *appsv1beta1.Deployment, *appsv1beta2.Deployment, *extensionsv1beta1.Deployment:
 				currentDeployment, err := w.c.AppsV1().Deployments(v.Namespace).Get(v.Name, metav1.GetOptions{})
@@ -179,6 +187,18 @@ func (w *waiter) isPodReady(pod *corev1.Pod) bool {
 	}
 	w.log("Pod is not ready: %s/%s", pod.GetNamespace(), pod.GetName())
 	return false
+}
+
+func (w *waiter) jobReady(job *batchv1.Job) bool {
+	if job.Status.Failed > *job.Spec.BackoffLimit {
+		w.log("Job is failed: %s/%s", job.GetNamespace(), job.GetName())
+		return false
+	}
+	if job.Spec.Completions != nil && job.Status.Succeeded < *job.Spec.Completions {
+		w.log("Job is not completed: %s/%s", job.GetNamespace(), job.GetName())
+		return false
+	}
+	return true
 }
 
 func (w *waiter) serviceReady(s *corev1.Service) bool {

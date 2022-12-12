@@ -51,6 +51,12 @@ type Dependency struct {
 	Username string `json:"username,omitempty"`
 	// Repository password
 	Password string `json:"password,omitempty"`
+	// 子应用实例编码
+	ReleaseName string `json:"releaseName,omitempty"`
+	// 子应用实例操作历史ID
+	Commit string `json:"commit,omitempty"`
+	// 子应用实例执行优先级
+	Priority int `json:"priority,omitempty"`
 }
 
 // Lock is a lock file for dependencies.

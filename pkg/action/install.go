@@ -80,6 +80,7 @@ type Install struct {
 	DisableHooks             bool
 	Replace                  bool
 	Wait                     bool
+	WaitForJobs              bool
 	Devel                    bool
 	DependencyUpdate         bool
 	Timeout                  time.Duration
@@ -390,6 +391,18 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 			return i.failRelease(rel, err)
 		}
 
+	}
+
+	if i.Wait {
+		if i.WaitForJobs {
+			if err := i.cfg.KubeClient.WaitWithJobs(resources, i.Timeout); err != nil {
+				return i.failRelease(rel, err)
+			}
+		} else {
+			if err := i.cfg.KubeClient.Wait(resources, i.Timeout); err != nil {
+				return i.failRelease(rel, err)
+			}
+		}
 	}
 
 	if !i.DisableHooks {
