@@ -19,6 +19,7 @@ package action
 import (
 	"bytes"
 	"fmt"
+	semver "golang.org/x/mod/semver"
 	"io/ioutil"
 	"os"
 	"path"
@@ -571,7 +572,7 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	// as partials are not used after renderer.Render. Empty manifests are also
 	// removed here.
 	hs, manifests, err := releaseutil.SortManifests(files, caps.APIVersions, releaseutil.InstallOrder)
-	resourceChartMap := resourceChartMapping(hs, manifests)
+	resourceChartMap := resourceChartMapping(c, hs, manifests)
 	if err != nil {
 		// By catching parse errors here, we can prevent bogus releases from going
 		// to Kubernetes.
@@ -634,18 +635,20 @@ func (c *Configuration) renderResources(ch *chart.Chart, values chartutil.Values
 	return hs, b, resourceChartMap, notes, nil
 }
 
-func resourceChartMapping(hs []*release.Hook, manifests []releaseutil.Manifest) map[string]string {
+func resourceChartMapping(c *Configuration, hs []*release.Hook, manifests []releaseutil.Manifest) map[string]string {
+	kubeVersion := GetKubernetesVersion(c)
+
 	resourceChartMap := make(map[string]string, 0)
 	for i := range hs {
 		childChartName := getChildChartName(hs[i].Path)
-		if childChartName == "" {
+		if childChartName == "" || (semver.Compare(kubeVersion, "v1.22.0") >= 0 && hs[i].Kind == "Ingress") {
 			continue
 		}
 		resourceChartMap[fmt.Sprintf("%s:%s", hs[i].Kind, hs[i].Name)] = childChartName
 	}
 	for i := range manifests {
 		childChartName := getChildChartName(manifests[i].Name)
-		if childChartName == "" {
+		if childChartName == "" || (semver.Compare(kubeVersion, "v1.22.0") >= 0 && manifests[i].Head.Kind == "Ingress") {
 			continue
 		}
 		resourceChartMap[fmt.Sprintf("%s:%s", manifests[i].Head.Kind, manifests[i].Head.Metadata.Name)] = childChartName
@@ -863,4 +866,16 @@ func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (
 	}
 
 	return filename, errors.Errorf("failed to download %q (hint: running `helm repo update` may help)", name)
+}
+
+func GetKubernetesVersion(c *Configuration) string {
+	dc, err := c.RESTClientGetter.ToDiscoveryClient()
+	if err != nil {
+		return ""
+	}
+	kubeVersion, err := dc.ServerVersion()
+	if err != nil {
+		return ""
+	}
+	return kubeVersion.GitVersion
 }
