@@ -106,12 +106,12 @@ type Install struct {
 	UseReleaseName bool
 	PostRenderer   postrender.PostRenderer
 
-	Commit          string
-	ImagePullSecret []v1.LocalObjectReference
-	ChartName       string
-	ChartVersion    string
-	ClusterCode     string
-	AgentVersion    string
+	Commit                   string
+	ImagePullSecret          []v1.LocalObjectReference
+	ChartName                string
+	ChartVersion             string
+	ClusterCode              string
+	AgentVersion             string
 	DoCallbackReleaseHandler func(*release.Release)
 }
 
@@ -141,17 +141,17 @@ func NewInstall(cfg *Configuration,
 	agentVersion string,
 	doCallbackReleaseHandler func(*release.Release)) *Install {
 	return &Install{
-		ChartPathOptions: chartPathOptions,
-		cfg:              cfg,
-		Commit:           commit,
-		ImagePullSecret:  imagePullSecret,
-		Namespace:        namespace,
-		ReleaseName:      releaseName,
-		ChartName:        chartName,
-		ChartVersion:     chartVersion,
-		ClusterCode:      clusterCode,
-		AgentVersion:     agentVersion,
-		CreateNamespace:  true,
+		ChartPathOptions:         chartPathOptions,
+		cfg:                      cfg,
+		Commit:                   commit,
+		ImagePullSecret:          imagePullSecret,
+		Namespace:                namespace,
+		ReleaseName:              releaseName,
+		ChartName:                chartName,
+		ChartVersion:             chartVersion,
+		ClusterCode:              clusterCode,
+		AgentVersion:             agentVersion,
+		CreateNamespace:          true,
 		DoCallbackReleaseHandler: doCallbackReleaseHandler,
 	}
 }
@@ -285,7 +285,10 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 
 	// 在这里对要创建的对象添加标签
 	for _, r := range resources {
-		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil)
+		customLabelOnChart := rel.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+		customSelectorLabelOnChart := rel.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
+		customLabelOnResource := rel.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
 		if err != nil {
 			return nil, err
 		}

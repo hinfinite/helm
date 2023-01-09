@@ -225,11 +225,15 @@ func doExecuteHook(cfg *Configuration,
 	}
 
 	resources, err := cfg.KubeClient.Build(bytes.NewBufferString(h.Manifest), true)
+
 	// 如果是agent升级，则跳过添加标签这一步，因为agent原本是直接在集群中安装的没有对应标签，如果在这里加标签k8s会报错
 	if chartName != "hskp-devops-cluster-agent" {
 		// 在这里对要新chart包中的对象添加标签
 		for _, r := range resources {
-			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil)
+			customLabelOnChart := rl.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customSelectorLabelOnChart := rl.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
+			customLabelOnResource := rl.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
 			if err != nil {
 				return nil, err
 			}

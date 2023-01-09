@@ -18,14 +18,19 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/golang/glog"
 
 	"github.com/hinfinite/helm/pkg/action"
 	"github.com/hinfinite/helm/pkg/chart"
 	"github.com/hinfinite/helm/pkg/paginator"
 	"github.com/hinfinite/helm/pkg/paginator/adapter"
+	"github.com/hinfinite/helm/pkg/repo"
 	"sigs.k8s.io/yaml"
 )
 
@@ -50,7 +55,7 @@ func AddRepo(namespace string, repoConfig *RepoConfig) error {
 		username:              repoConfig.Username,
 		password:              repoConfig.Password,
 		noUpdate:              repoConfig.NoUpdate,
-		insecureSkipTLSverify: false,
+		insecureSkipTLSverify: true,
 		settings:              settings,
 	}
 	return o.run(os.Stdout)
@@ -80,9 +85,33 @@ type ListOptions struct {
 	Size        int    `json:"size,omitempty"`
 }
 
+func CheckExist(namespace string, repoConfig *RepoConfig) bool {
+	_, settings := getCfg(namespace)
+
+	repoFile := settings.RepositoryConfig
+
+	err := os.MkdirAll(filepath.Dir(repoFile), os.ModePerm)
+	if err != nil && !os.IsExist(err) {
+		return false
+	}
+	b, err := ioutil.ReadFile(repoFile)
+	if err != nil && !os.IsNotExist(err) {
+		return false
+	}
+
+	var f repo.File
+	if err := yaml.Unmarshal(b, &f); err != nil {
+		return false
+	}
+	return f.Has(repoConfig.Name)
+
+}
 func ListChart(namespace string, repoConfig *RepoConfig, listOpts *ListOptions) (*paginator.Page, error) {
 	// Add repo
-	AddRepo(namespace, repoConfig)
+	if !CheckExist(namespace, repoConfig) {
+		glog.Info("<<<<<<<<执行ListChart发现仓库不存在，执行AddRepo")
+		AddRepo(namespace, repoConfig)
+	}
 
 	// Set search options
 	_, settings := getCfg(namespace)
@@ -144,7 +173,9 @@ type ChartDetail struct {
 // ShowDetail show chart details with multiple versions
 func ShowDetail(namespace string, repoConfig *RepoConfig, showOpts *ShowOptions) (*ChartDetail, error) {
 	// Add repo
-	AddRepo(namespace, repoConfig)
+	if !repoConfig.NoUpdate {
+		AddRepo(namespace, repoConfig)
+	}
 
 	// Set show options
 	cfg, settings := getCfg(namespace)
