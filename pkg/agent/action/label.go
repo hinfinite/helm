@@ -1,6 +1,7 @@
 package action
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/golang/glog"
@@ -145,12 +146,100 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			glog.Warningf("Set ImagePullSecrets failed, %v", err)
 		}
 	}
+	//添加Spring-boot应用监控指标指标
+	var handlerSpringBootMonitorMetrics = func() {
+		metricsEnabled := customLabelOnChart["hskp.io/spring_boot_metrics_enabled"]
+		if metricsEnabled != "true" {
+			return
+		}
+
+		unstructuredPodTemplateSpec, _, err := unstructured.NestedFieldCopy(t.Object, "spec", "template")
+		if err != nil {
+			glog.Warningf("Get spec.template failed, %v", err)
+		}
+		if unstructuredPodTemplateSpec == nil {
+			glog.Warningf(">>>>>>>>>>>>>>>>>podTemplateSpec is null")
+			return
+		}
+		podTemplateSpec := v1.PodTemplateSpec{}
+
+		ToObj(unstructuredPodTemplateSpec, &podTemplateSpec)
+		//注解
+		if podTemplateSpec.Annotations == nil {
+			podTemplateSpec.Annotations = map[string]string{}
+		}
+		podTemplateSpec.Annotations["prometheus.io/port"] = "9464"
+		podTemplateSpec.Annotations["prometheus.io/scrape"] = "true"
+
+		//标签
+		if podTemplateSpec.Labels == nil {
+			podTemplateSpec.Labels = map[string]string{}
+		}
+		podTemplateSpec.Labels["prometheus.io/port"] = "9464"
+		podTemplateSpec.Labels["hskp.io/component"] = "springboot"
+
+		podSpec := podTemplateSpec.Spec
+		if podSpec.Containers == nil {
+			glog.Warningf(">>>>>>>>>>>>>>>>>podSpec.Containers is null")
+			return
+		}
+		//挂载点
+		volumeMount := v1.VolumeMount{
+			Name:      "agent",
+			MountPath: "/agent",
+		}
+		//设置agentInitContainer
+		if podSpec.InitContainers == nil {
+			podSpec.InitContainers = make([]v1.Container, 1, 1)
+		}
+		agentInitContainer := v1.Container{
+			Name:         "java-agent",
+			Image:        "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.0.0",
+			Command:      []string{"sh", "-c", "cp /data/opentelemetry-javaagent.jar /agent"},
+			VolumeMounts: []v1.VolumeMount{volumeMount},
+		}
+		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
+		//给Containers设置挂载点
+		for _, c := range podSpec.Containers {
+			if c.VolumeMounts == nil {
+				c.VolumeMounts = make([]v1.VolumeMount, 1, 1)
+			}
+			c.VolumeMounts = append(c.VolumeMounts, volumeMount)
+		}
+
+		if podSpec.Volumes == nil {
+			podSpec.Volumes = make([]v1.Volume, 1, 1)
+		}
+		volume := v1.Volume{
+			Name: "agent",
+			VolumeSource: v1.VolumeSource{
+				EmptyDir: &v1.EmptyDirVolumeSource{},
+			},
+		}
+		podSpec.Volumes = append(podSpec.Volumes, volume)
+
+		if err := unstructured.SetNestedField(t.Object, podSpec, "spec", "template", "spec"); err != nil {
+			glog.Warningf("Set spec failed, %v", err)
+		}
+
+	}
+
+	//var addMetricsInitContainer = func() {
+	//	metricsEnabled := customLabelOnChart["hskp.io/metrics_enabled"]
+	//	if metricsEnabled != "true" {
+	//		return
+	//	}
+	//
+	//}
 
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
 		addImagePullSecrets()
 		addSelectorAppLabels()
 		addTemplateAppLabels(kind, t.GetName())
+		if kind == "Deployment" {
+			handlerSpringBootMonitorMetrics()
+		}
 		if isUpgrade {
 			if kind == "ReplicaSet" {
 				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(t.GetName(), metav1.GetOptions{})
@@ -233,6 +322,14 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 	t.SetLabels(l)
 	return nil
+}
+
+func ToObj(data interface{}, into interface{}) error {
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(bytes, into)
 }
 
 func setCronJobPodTemplateLabels(obj map[string]interface{}, templateLabels map[string]string) error {
