@@ -218,7 +218,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		podSpec.Volumes = append(podSpec.Volumes, volume)
 
-		if err := unstructured.SetNestedField(t.Object, podSpec, "spec", "template", "spec"); err != nil {
+		if err := unstructured.SetNestedField(t.Object, podTemplateSpec, "spec", "template"); err != nil {
 			glog.Warningf("Set spec failed, %v", err)
 		}
 
