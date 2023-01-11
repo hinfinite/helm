@@ -153,7 +153,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			return
 		}
 
-		unstructuredPodTemplateSpec, _, err := unstructured.NestedFieldCopy(t.Object, "spec", "template")
+		unstructuredPodTemplateSpec, _, err := unstructured.NestedFieldNoCopy(t.Object, "spec", "template")
 		if err != nil {
 			glog.Warningf("Get spec.template failed, %v", err)
 		}
