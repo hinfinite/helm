@@ -3,6 +3,7 @@ package action
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
@@ -218,7 +219,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		podSpec.Volumes = append(podSpec.Volumes, volume)
 
-		if err := unstructured.SetNestedField(t.Object, podTemplateSpec, "spec", "template"); err != nil {
+		if err := setNestedFieldNoCopy(t.Object, podTemplateSpec, "spec", "template"); err != nil {
 			glog.Warningf("Set spec failed, %v", err)
 		}
 
@@ -330,6 +331,28 @@ func ToObj(data interface{}, into interface{}) error {
 		return err
 	}
 	return json.Unmarshal(bytes, into)
+}
+func setNestedFieldNoCopy(obj map[string]interface{}, value interface{}, fields ...string) error {
+	m := obj
+
+	for i, field := range fields[:len(fields)-1] {
+		if val, ok := m[field]; ok {
+			if valMap, ok := val.(map[string]interface{}); ok {
+				m = valMap
+			} else {
+				return fmt.Errorf("value cannot be set because %v is not a map[string]interface{}", jsonPath(fields[:i+1]))
+			}
+		} else {
+			newVal := make(map[string]interface{})
+			m[field] = newVal
+			m = newVal
+		}
+	}
+	m[fields[len(fields)-1]] = value
+	return nil
+}
+func jsonPath(fields []string) string {
+	return "." + strings.Join(fields, ".")
 }
 
 func setCronJobPodTemplateLabels(obj map[string]interface{}, templateLabels map[string]string) error {
