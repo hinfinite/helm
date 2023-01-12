@@ -1,6 +1,7 @@
 package action
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -156,7 +157,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 
 		unstructuredPodTemplateSpec, _, err := unstructured.NestedFieldNoCopy(t.Object, "spec", "template")
 		if err != nil {
-			glog.Warningf("Get spec.template failed, %v", err)
+			glog.Error("Get spec.template failed, %v", err)
 		}
 		if unstructuredPodTemplateSpec == nil {
 			glog.Warningf(">>>>>>>>>>>>>>>>>podTemplateSpec is null")
@@ -179,7 +180,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		podTemplateSpec.Labels["prometheus.io/port"] = "9464"
 		podTemplateSpec.Labels["hskp.io/component"] = "springboot"
 
-		podSpec := podTemplateSpec.Spec
+		podSpec := &podTemplateSpec.Spec
 		if podSpec.Containers == nil {
 			glog.Warningf(">>>>>>>>>>>>>>>>>podSpec.Containers is null")
 			return
@@ -218,20 +219,15 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			},
 		}
 		podSpec.Volumes = append(podSpec.Volumes, volume)
-
-		if err := setNestedFieldNoCopy(t.Object, podTemplateSpec, "spec", "template"); err != nil {
-			glog.Warningf("Set spec failed, %v", err)
+		encodeMap, err := EncodeToMap(podTemplateSpec)
+		if err != nil {
+			glog.Error("Get spec.template failed, %v", err)
+		}
+		if err := unstructured.SetNestedMap(t.Object, encodeMap, "spec", "template"); err != nil {
+			glog.Error("Set spec failed, %v", err)
 		}
 
 	}
-
-	//var addMetricsInitContainer = func() {
-	//	metricsEnabled := customLabelOnChart["hskp.io/metrics_enabled"]
-	//	if metricsEnabled != "true" {
-	//		return
-	//	}
-	//
-	//}
 
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
@@ -331,6 +327,24 @@ func ToObj(data interface{}, into interface{}) error {
 		return err
 	}
 	return json.Unmarshal(bytes, into)
+}
+func EncodeToMap(obj interface{}) (map[string]interface{}, error) {
+	if m, ok := obj.(map[string]interface{}); ok {
+		return m, nil
+	}
+
+	if unstr, ok := obj.(*unstructured.Unstructured); ok {
+		return unstr.Object, nil
+	}
+
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return nil, err
+	}
+	result := map[string]interface{}{}
+	dec := json.NewDecoder(bytes.NewBuffer(b))
+	dec.UseNumber()
+	return result, dec.Decode(&result)
 }
 func setNestedFieldNoCopy(obj map[string]interface{}, value interface{}, fields ...string) error {
 	m := obj
