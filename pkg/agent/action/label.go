@@ -192,7 +192,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		//设置agentInitContainer
 		if podSpec.InitContainers == nil {
-			podSpec.InitContainers = make([]v1.Container, 1, 1)
+			podSpec.InitContainers = []v1.Container{}
 		}
 		agentInitContainer := v1.Container{
 			Name:         "java-agent",
@@ -204,13 +204,13 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		//给Containers设置挂载点
 		for _, c := range podSpec.Containers {
 			if c.VolumeMounts == nil {
-				c.VolumeMounts = make([]v1.VolumeMount, 1, 1)
+				c.VolumeMounts = []v1.VolumeMount{}
 			}
 			c.VolumeMounts = append(c.VolumeMounts, volumeMount)
 		}
 
 		if podSpec.Volumes == nil {
-			podSpec.Volumes = make([]v1.Volume, 1, 1)
+			podSpec.Volumes = []v1.Volume{}
 		}
 		volume := v1.Volume{
 			Name: "agent",
