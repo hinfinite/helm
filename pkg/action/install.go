@@ -19,6 +19,7 @@ package action
 import (
 	"bytes"
 	"fmt"
+	"github.com/golang/glog"
 	semver "golang.org/x/mod/semver"
 	"io/ioutil"
 	"os"
@@ -838,6 +839,10 @@ func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (
 		RepositoryConfig: settings.RepositoryConfig,
 		RepositoryCache:  settings.RepositoryCache,
 	}
+	// 打印地址便于问题排查
+	glog.Infof("repository config: %s\n", settings.RepositoryConfig)
+	glog.Infof("repository cache: %s\n", settings.RepositoryCache)
+
 	if c.Verify {
 		dl.Verify = downloader.VerifyAlways
 	}
@@ -864,6 +869,8 @@ func (c *ChartPathOptions) LocateChart(name string, settings *cli.EnvSettings) (
 	} else if settings.Debug {
 		return filename, err
 	}
+	// 添加打印err便于排查问题
+	glog.Errorf("chart download error: %v\n", err)
 
 	return filename, errors.Errorf("failed to download %q (hint: running `helm repo update` may help)", name)
 }
