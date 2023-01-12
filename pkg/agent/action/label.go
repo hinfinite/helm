@@ -202,7 +202,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
 		//给Containers设置挂载点
-		for _, c := range podSpec.Containers {
+		for index, _ := range podSpec.Containers {
+			c := &podSpec.Containers[index]
 			if c.VolumeMounts == nil {
 				c.VolumeMounts = []v1.VolumeMount{}
 			}
