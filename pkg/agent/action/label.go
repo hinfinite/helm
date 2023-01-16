@@ -170,14 +170,14 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		if podTemplateSpec.Annotations == nil {
 			podTemplateSpec.Annotations = map[string]string{}
 		}
-		podTemplateSpec.Annotations["prometheus.io/port"] = "9464"
+		podTemplateSpec.Annotations["prometheus.io/port"] = "15020"
 		podTemplateSpec.Annotations["prometheus.io/scrape"] = "true"
 
 		//标签
 		if podTemplateSpec.Labels == nil {
 			podTemplateSpec.Labels = map[string]string{}
 		}
-		podTemplateSpec.Labels["prometheus.io/port"] = "9464"
+		podTemplateSpec.Labels["prometheus.io/port"] = "15020"
 		podTemplateSpec.Labels["hskp.io/component"] = "springboot"
 
 		podSpec := &podTemplateSpec.Spec
