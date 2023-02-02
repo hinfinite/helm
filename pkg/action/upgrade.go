@@ -232,6 +232,8 @@ func (u *Upgrade) prepareUpgrade(name string, chart *chart.Chart, vals map[strin
 		Hooks:            hooks,
 		ResourceChartMap: resourceChartMap,
 	}
+	//同一个chart，Resource和Chart的对应关系应该是不会变化的，故不用单独再去构造
+	currentRelease.ResourceChartMap = resourceChartMap
 
 	if len(notesTxt) > 0 {
 		upgradedRelease.Info.Notes = notesTxt
