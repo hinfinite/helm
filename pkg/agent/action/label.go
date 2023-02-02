@@ -151,7 +151,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	//添加Spring-boot应用监控指标指标
 	var handlerSpringBootMonitorMetrics = func() {
 		metricsEnabled := customLabelOnChart["hskp.io/spring_boot_metrics_enabled"]
-		if metricsEnabled != "true" {
+		traceEnabled := customLabelOnChart["hskp.io/spring_boot_trace_enabled"]
+		if metricsEnabled != "true" && traceEnabled != "true" {
 			return
 		}
 
@@ -166,19 +167,21 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		podTemplateSpec := v1.PodTemplateSpec{}
 
 		ToObj(unstructuredPodTemplateSpec, &podTemplateSpec)
-		//注解
-		if podTemplateSpec.Annotations == nil {
-			podTemplateSpec.Annotations = map[string]string{}
-		}
-		podTemplateSpec.Annotations["prometheus.io/port"] = "9464"
-		podTemplateSpec.Annotations["prometheus.io/scrape"] = "true"
+		if metricsEnabled == "true" {
+			//注解
+			if podTemplateSpec.Annotations == nil {
+				podTemplateSpec.Annotations = map[string]string{}
+			}
+			podTemplateSpec.Annotations["prometheus.io/port"] = "9464"
+			podTemplateSpec.Annotations["prometheus.io/scrape"] = "true"
 
-		//标签
-		if podTemplateSpec.Labels == nil {
-			podTemplateSpec.Labels = map[string]string{}
+			//标签
+			if podTemplateSpec.Labels == nil {
+				podTemplateSpec.Labels = map[string]string{}
+			}
+			podTemplateSpec.Labels["prometheus.io/port"] = "9464"
+			podTemplateSpec.Labels["hskp.io/component"] = "springboot"
 		}
-		podTemplateSpec.Labels["prometheus.io/port"] = "9464"
-		podTemplateSpec.Labels["hskp.io/component"] = "springboot"
 
 		podSpec := &podTemplateSpec.Spec
 		if podSpec.Containers == nil {
