@@ -60,7 +60,7 @@ type Upgrade struct {
 	SkipCRDs     bool
 	Timeout      time.Duration
 	Wait         bool
-	WaitForJobs              bool
+	WaitForJobs  bool
 	DisableHooks bool
 	DryRun       bool
 	Force        bool
@@ -109,6 +109,7 @@ func NewUpgrade(cfg *Configuration,
 		AgentVersion:     agentVersion,
 		MaxHistory:       maxHistory,
 		ReuseValues:      reuseValues,
+		Force:            true,
 	}
 }
 
