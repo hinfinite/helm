@@ -255,7 +255,8 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 			customLabelOnChart := upgradedRelease.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
 			customSelectorLabelOnChart := upgradedRelease.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
 			customLabelOnResource := upgradedRelease.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
+			commonLabelOnChart := upgradedRelease.GetCommonLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
 			if err != nil {
 				return nil, err
 			}
@@ -264,7 +265,8 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 			customLabelOnChart := originalRelease.GetCustomLabelOnChart(c.Mapping.GroupVersionKind.Kind, c.Name)
 			customSelectorLabelOnChart := originalRelease.GetCustomSelectorLabelOnChar(c.Mapping.GroupVersionKind.Kind, c.Name)
 			customLabelOnResource := originalRelease.GetCustomLabelOnResource(c.Mapping.GroupVersionKind.Kind, c.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, c, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
+			commonLabelOnChart := originalRelease.GetCommonLabelOnChart(c.Mapping.GroupVersionKind.Kind, c.Name)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, c, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
 			if err != nil {
 				return nil, err
 			}

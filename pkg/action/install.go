@@ -288,7 +288,8 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 		customLabelOnChart := rel.GetCustomLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
 		customSelectorLabelOnChart := rel.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
 		customLabelOnResource := rel.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
-		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource)
+		commonLabelOnChart := rel.GetCommonLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
+		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
 		if err != nil {
 			return nil, err
 		}
@@ -456,10 +457,10 @@ func (i *Install) failRelease(rel *release.Release, err error) (*release.Release
 //
 // Roughly, this will return an error if name is
 //
-//	- empty
-//	- too long
-//	- already in use, and not deleted
-//	- used by a deleted release, and i.Replace is false
+//   - empty
+//   - too long
+//   - already in use, and not deleted
+//   - used by a deleted release, and i.Replace is false
 func (i *Install) availableName() error {
 	start := i.ReleaseName
 	if start == "" {

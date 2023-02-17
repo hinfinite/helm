@@ -61,7 +61,26 @@ func (r *Release) SetStatus(status Status, msg string) {
 	r.Info.Description = msg
 }
 
-//基于资源类型和名称获取chart维度的自定义标签
+// 基于资源类型和名称获取chart维度的通用标签
+func (r *Release) GetCommonLabelOnChart(kind string, name string) map[string]string {
+	result := make(map[string]string)
+	if r.ChartCustomLabelMap == nil {
+		r.ChartCustomLabelMap = r.parseCustomLabel("hskp_devops_common_label")
+	}
+	if r.ResourceChartMap == nil {
+		glog.Info("ResourceChartMap空，无法获取通用标签 ")
+		return result
+	}
+	resourceChartKey := fmt.Sprintf("%s:%s", kind, name)
+	if charName, ok := r.ResourceChartMap[resourceChartKey]; ok {
+		if charCustomLabel, ok := r.ChartCustomLabelMap[charName]; ok {
+			result = charCustomLabel
+		}
+	}
+	return result
+}
+
+// 基于资源类型和名称获取chart维度的自定义标签
 func (r *Release) GetCustomLabelOnChart(kind string, name string) map[string]string {
 	result := make(map[string]string)
 	if r.ChartCustomLabelMap == nil {
@@ -80,7 +99,7 @@ func (r *Release) GetCustomLabelOnChart(kind string, name string) map[string]str
 	return result
 }
 
-//基于资源类型和名称获取chart维度的自定义标签选择器
+// 基于资源类型和名称获取chart维度的自定义标签选择器
 func (r *Release) GetCustomSelectorLabelOnChar(kind string, name string) map[string]string {
 	result := make(map[string]string)
 	if r.ChartCustomSelectorLabelMap == nil {
@@ -99,7 +118,7 @@ func (r *Release) GetCustomSelectorLabelOnChar(kind string, name string) map[str
 	return result
 }
 
-//基于资源类型和名称获取资源维度的自定义标签
+// 基于资源类型和名称获取资源维度的自定义标签
 func (r *Release) GetCustomLabelOnResource(kind string, name string) map[string]string {
 	result := make(map[string]string)
 	if r.ResourceCustomLabelMap == nil {
