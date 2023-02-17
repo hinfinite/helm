@@ -215,7 +215,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			}
 			mountPathExist := false
 			for _, existVolumeMount := range c.VolumeMounts {
-				if existVolumeMount.MountPath == existVolumeMount.MountPath {
+				if existVolumeMount.MountPath == volumeMount.MountPath {
 					mountPathExist = true
 					mountedVolumes = append(mountedVolumes, existVolumeMount)
 					break
@@ -318,7 +318,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			}
 			mountPathExist := false
 			for _, existVolumeMount := range c.VolumeMounts {
-				if existVolumeMount.MountPath == existVolumeMount.MountPath {
+				if existVolumeMount.MountPath == volumeMount.MountPath {
 					mountPathExist = true
 					mountedVolumes = append(mountedVolumes, existVolumeMount)
 					break
