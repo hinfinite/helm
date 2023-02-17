@@ -29,7 +29,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	clientSet *kubernetes.Clientset,
 	customLabelOnChart map[string]string,
 	customSelectorLabelOnChart map[string]string,
-	customLabelOnResource map[string]string) error {
+	customLabelOnResource map[string]string,
+	hskpCommonLabelOnChart map[string]string) error {
 	t := info.Object.(*unstructured.Unstructured)
 	kind := info.Mapping.GroupVersionKind.Kind
 
@@ -205,24 +206,51 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
 		//给Containers设置挂载点
+		//给Containers设置挂载点。
+		var mountedVolumes []v1.VolumeMount
 		for index, _ := range podSpec.Containers {
 			c := &podSpec.Containers[index]
 			if c.VolumeMounts == nil {
 				c.VolumeMounts = []v1.VolumeMount{}
 			}
+			mountPathExist := false
+			for _, existVolumeMount := range c.VolumeMounts {
+				if existVolumeMount.MountPath == existVolumeMount.MountPath {
+					mountPathExist = true
+					mountedVolumes = append(mountedVolumes, existVolumeMount)
+					break
+				}
+			}
+			if mountPathExist {
+				continue
+			}
 			c.VolumeMounts = append(c.VolumeMounts, volumeMount)
-		}
+			mountedVolumes = append(mountedVolumes, volumeMount)
 
+		}
+		//基于mountedVolumes添加volumes,
 		if podSpec.Volumes == nil {
 			podSpec.Volumes = []v1.Volume{}
 		}
-		volume := v1.Volume{
-			Name: "agent",
-			VolumeSource: v1.VolumeSource{
-				EmptyDir: &v1.EmptyDirVolumeSource{},
-			},
+		for _, mountedVolume := range mountedVolumes {
+			exist := false
+			for _, existVolume := range podSpec.Volumes {
+				if existVolume.Name == mountedVolume.Name {
+					exist = true
+					break
+				}
+			}
+			if exist {
+				continue
+			}
+			volume := v1.Volume{
+				Name: mountedVolume.Name,
+				VolumeSource: v1.VolumeSource{
+					EmptyDir: &v1.EmptyDirVolumeSource{},
+				},
+			}
+			podSpec.Volumes = append(podSpec.Volumes, volume)
 		}
-		podSpec.Volumes = append(podSpec.Volumes, volume)
 		encodeMap, err := EncodeToMap(podTemplateSpec)
 		if err != nil {
 			glog.Error("Get spec.template failed, %v", err)
@@ -232,7 +260,110 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 
 	}
+	//处理hzero1.10的license权限认证
+	var handlerSvcLicense = func() {
+		svcLicenseeEnabled := hskpCommonLabelOnChart["hskp.io/svc_licensee_enabled"]
+		svcLicenseeLicUrl := hskpCommonLabelOnChart["hskp.io/svc_licensee_lic_url"]
+		if svcLicenseeEnabled != "true" {
+			return
+		}
 
+		unstructuredPodTemplateSpec, _, err := unstructured.NestedFieldNoCopy(t.Object, "spec", "template")
+		if err != nil {
+			glog.Error("Get spec.template failed, %v", err)
+		}
+		if unstructuredPodTemplateSpec == nil {
+			glog.Warningf(">>>>>>>>>>>>>>>>>podTemplateSpec is null")
+			return
+		}
+		podTemplateSpec := v1.PodTemplateSpec{}
+
+		ToObj(unstructuredPodTemplateSpec, &podTemplateSpec)
+
+		podSpec := &podTemplateSpec.Spec
+		if podSpec.Containers == nil {
+			glog.Warningf(">>>>>>>>>>>>>>>>>podSpec.Containers is null")
+			return
+		}
+		//挂载点
+		volumeMount := v1.VolumeMount{
+			Name:      "agent",
+			MountPath: "/agent",
+		}
+		//设置agentInitContainer
+		if podSpec.InitContainers == nil {
+			podSpec.InitContainers = []v1.Container{}
+		}
+		agentInitContainer := v1.Container{
+			Name:         "hskp-license-agent",
+			Image:        "harbor.open.hand-china.com/hskp/hskp-license-agent:v1.1.0",
+			Command:      []string{"sh", "-c", "bash /data/agents/download_license.sh && cp /data/agents/* /agent && mkdir /agent/licenses && cp /data/licenses/* /agent/licenses"},
+			VolumeMounts: []v1.VolumeMount{volumeMount},
+		}
+		//设置lic文件下载路径
+		if svcLicenseeLicUrl != "" {
+			licenseeLicUrlEnv := v1.EnvVar{
+				Name:  "HSKP_DOWNLOAD_LICENSE_URL",
+				Value: svcLicenseeLicUrl,
+			}
+			agentInitContainer.Env = append(agentInitContainer.Env, licenseeLicUrlEnv)
+		}
+		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
+		//给Containers设置挂载点。
+		var mountedVolumes []v1.VolumeMount
+		for index, _ := range podSpec.Containers {
+			c := &podSpec.Containers[index]
+			if c.VolumeMounts == nil {
+				c.VolumeMounts = []v1.VolumeMount{}
+			}
+			mountPathExist := false
+			for _, existVolumeMount := range c.VolumeMounts {
+				if existVolumeMount.MountPath == existVolumeMount.MountPath {
+					mountPathExist = true
+					mountedVolumes = append(mountedVolumes, existVolumeMount)
+					break
+				}
+			}
+			if mountPathExist {
+				continue
+			}
+			c.VolumeMounts = append(c.VolumeMounts, volumeMount)
+			mountedVolumes = append(mountedVolumes, volumeMount)
+
+		}
+		//基于mountedVolumes添加volumes,
+		if podSpec.Volumes == nil {
+			podSpec.Volumes = []v1.Volume{}
+		}
+		for _, mountedVolume := range mountedVolumes {
+			exist := false
+			for _, existVolume := range podSpec.Volumes {
+				if existVolume.Name == mountedVolume.Name {
+					exist = true
+					break
+				}
+			}
+			if exist {
+				continue
+			}
+			volume := v1.Volume{
+				Name: mountedVolume.Name,
+				VolumeSource: v1.VolumeSource{
+					EmptyDir: &v1.EmptyDirVolumeSource{},
+				},
+			}
+			podSpec.Volumes = append(podSpec.Volumes, volume)
+		}
+
+		encodeMap, err := EncodeToMap(podTemplateSpec)
+		if err != nil {
+			glog.Error("Get spec.template failed, %v", err)
+		}
+		if err := unstructured.SetNestedMap(t.Object, encodeMap, "spec", "template"); err != nil {
+			glog.Error("Set spec failed, %v", err)
+		}
+
+	}
 	switch kind {
 	case "ReplicationController", "ReplicaSet", "Deployment":
 		addImagePullSecrets()
@@ -240,6 +371,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		addTemplateAppLabels(kind, t.GetName())
 		if kind == "Deployment" {
 			handlerSpringBootMonitorMetrics()
+			handlerSvcLicense()
 		}
 		if isUpgrade {
 			if kind == "ReplicaSet" {
