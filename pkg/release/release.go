@@ -47,12 +47,14 @@ type Release struct {
 
 	// 资源对应的chart名称 k=kind:name v=chart名称
 	ResourceChartMap map[string]string `json:"resource_chart_map,omitempty"`
+	// chart维度通用标签，k=charName v=自定义标签
+	ChartCommonLabelMap map[string]map[string]string `json:"chart_common_label_map,omitempty"`
 	// chart维度自定义标签，k=charName v=自定义标签
-	ChartCustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	ChartCustomLabelMap map[string]map[string]string `json:"chart_custom_label_map,omitempty"`
 	// chart维度自定义标签选择器，k=charName v=自定义标签
-	ChartCustomSelectorLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	ChartCustomSelectorLabelMap map[string]map[string]string `json:"chart_custom_selector_label_map,omitempty"`
 	// resource维度自定义标签，k=kind_name v=自定义标签
-	ResourceCustomLabelMap map[string]map[string]string `json:"resource_chart_map,omitempty"`
+	ResourceCustomLabelMap map[string]map[string]string `json:"resource_custom_label_map,omitempty"`
 }
 
 // SetStatus is a helper for setting the status on a release.
@@ -64,8 +66,8 @@ func (r *Release) SetStatus(status Status, msg string) {
 // 基于资源类型和名称获取chart维度的通用标签
 func (r *Release) GetCommonLabelOnChart(kind string, name string) map[string]string {
 	result := make(map[string]string)
-	if r.ChartCustomLabelMap == nil {
-		r.ChartCustomLabelMap = r.parseCustomLabel("hskp_devops_common_label")
+	if r.ChartCommonLabelMap == nil {
+		r.ChartCommonLabelMap = r.parseCustomLabel("hskp_devops_common_label")
 	}
 	if r.ResourceChartMap == nil {
 		glog.Info("ResourceChartMap空，无法获取通用标签 ")
@@ -73,8 +75,8 @@ func (r *Release) GetCommonLabelOnChart(kind string, name string) map[string]str
 	}
 	resourceChartKey := fmt.Sprintf("%s:%s", kind, name)
 	if charName, ok := r.ResourceChartMap[resourceChartKey]; ok {
-		if charCustomLabel, ok := r.ChartCustomLabelMap[charName]; ok {
-			result = charCustomLabel
+		if charCommonLabel, ok := r.ChartCommonLabelMap[charName]; ok {
+			result = charCommonLabel
 		}
 	}
 	return result
