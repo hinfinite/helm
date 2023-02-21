@@ -297,7 +297,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		agentInitContainer := v1.Container{
 			Name:         "hskp-license-agent",
 			Image:        "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.1.0",
-			Command:      []string{"sh", "-c", "bash /data/agents/download_license.sh && cp /data/agents/* /agent && mkdir /agent/licenses && cp /data/licenses/* /agent/licenses"},
+			Command:      []string{"sh", "-c", "bash /data/agents/download_license.sh && cp /data/agents/* /agent"},
 			VolumeMounts: []v1.VolumeMount{volumeMount},
 		}
 		//设置lic文件下载路径
