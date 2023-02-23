@@ -17,6 +17,7 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"io"
 	"io/ioutil"
 	"log"
@@ -644,7 +645,8 @@ func (m *Manager) loadChartRepositories() (map[string]*repo.ChartRepository, err
 		idxFile := filepath.Join(m.RepositoryCache, helmpath.CacheIndexFile(lname))
 		index, err := repo.LoadIndexFile(idxFile)
 		if err != nil {
-			return indices, err
+			glog.Info(fmt.Sprintf("LoadIndexFile: %s  withi err: %s", idxFile, err.Error()))
+			continue
 		}
 
 		// TODO: use constructor
