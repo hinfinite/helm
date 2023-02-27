@@ -17,6 +17,7 @@ package downloader
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"io"
 	"io/ioutil"
 	"net/url"
@@ -377,6 +378,7 @@ func (c *ChartDownloader) scanReposForURL(u string, rf *repo.File) (*repo.Entry,
 		i, err := repo.LoadIndexFile(idxFile)
 		if err != nil {
 			//20230227by wxx： 加载index文件失败直接跳过
+			glog.Info(fmt.Sprintf("load index file with err: %s", err.Error()))
 			continue
 			//return nil, errors.Wrap(err, "no cached repo found. (try 'helm repo update')")
 		}
