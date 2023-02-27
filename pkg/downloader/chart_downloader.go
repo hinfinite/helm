@@ -172,11 +172,11 @@ func (c *ChartDownloader) DownloadTo(ref, version, dest string) (string, *proven
 //
 // A version is a SemVer string (1.2.3-beta.1+f334a6789).
 //
-//	- For fully qualified URLs, the version will be ignored (since URLs aren't versioned)
-//	- For a chart reference
-//		* If version is non-empty, this will return the URL for that version
-//		* If version is empty, this will return the URL for the latest version
-//		* If no version can be found, an error is returned
+//   - For fully qualified URLs, the version will be ignored (since URLs aren't versioned)
+//   - For a chart reference
+//   - If version is non-empty, this will return the URL for that version
+//   - If version is empty, this will return the URL for the latest version
+//   - If no version can be found, an error is returned
 func (c *ChartDownloader) ResolveChartVersion(ref, version string) (*url.URL, error) {
 	// added by allen.liu @2022-10-20 for tls repo
 	c.Options = append(c.Options, getter.WithInsecureSkipVerifyTLS(true))
@@ -376,7 +376,9 @@ func (c *ChartDownloader) scanReposForURL(u string, rf *repo.File) (*repo.Entry,
 		idxFile := filepath.Join(c.RepositoryCache, helmpath.CacheIndexFile(r.Config.Name))
 		i, err := repo.LoadIndexFile(idxFile)
 		if err != nil {
-			return nil, errors.Wrap(err, "no cached repo found. (try 'helm repo update')")
+			//20230227by wxx： 加载index文件失败直接跳过
+			continue
+			//return nil, errors.Wrap(err, "no cached repo found. (try 'helm repo update')")
 		}
 
 		for _, entry := range i.Entries {
