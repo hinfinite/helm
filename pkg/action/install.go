@@ -290,7 +290,7 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 		customSelectorLabelOnChart := rel.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
 		customLabelOnResource := rel.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
 		commonLabelOnChart := rel.GetCommonLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
-		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
+		err = action.AddLabel(i.ImagePullSecret, i.ClusterCode, r, i.Commit, i.ChartVersion, i.ReleaseName, i.ChartName, i.AgentVersion, i.Namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart, false)
 		if err != nil {
 			return nil, err
 		}

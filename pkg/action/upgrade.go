@@ -256,7 +256,7 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 			customSelectorLabelOnChart := upgradedRelease.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
 			customLabelOnResource := upgradedRelease.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
 			commonLabelOnChart := upgradedRelease.GetCommonLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, r, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart, false)
 			if err != nil {
 				return nil, err
 			}
@@ -266,7 +266,7 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 			customSelectorLabelOnChart := originalRelease.GetCustomSelectorLabelOnChar(c.Mapping.GroupVersionKind.Kind, c.Name)
 			customLabelOnResource := originalRelease.GetCustomLabelOnResource(c.Mapping.GroupVersionKind.Kind, c.Name)
 			commonLabelOnChart := originalRelease.GetCommonLabelOnChart(c.Mapping.GroupVersionKind.Kind, c.Name)
-			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, c, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
+			err = action.AddLabel(u.ImagePullSecret, u.ClusterCode, c, u.Commit, u.ChartVersion, u.ReleaseName, u.ChartName, u.AgentVersion, originalRelease.Namespace, true, u.cfg.ClientSet, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart, true)
 			if err != nil {
 				return nil, err
 			}

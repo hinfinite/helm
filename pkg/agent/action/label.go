@@ -30,7 +30,8 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	customLabelOnChart map[string]string,
 	customSelectorLabelOnChart map[string]string,
 	customLabelOnResource map[string]string,
-	hskpCommonLabelOnChart map[string]string) error {
+	hskpCommonLabelOnChart map[string]string,
+	currentFlag bool) error {
 	t := info.Object.(*unstructured.Unstructured)
 	kind := info.Mapping.GroupVersionKind.Kind
 
@@ -194,6 +195,10 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			Name:      "hskp-agent",
 			MountPath: "/hskp/agent",
 		}
+		//更新的时候需要对当前的资源也进行处理，但是部分资源需要前后不一致，否则更新的时候无法生成patch path
+		if currentFlag {
+			volumeMount.Name = "hskp-agent-old"
+		}
 		//设置agentInitContainer
 		if podSpec.InitContainers == nil {
 			podSpec.InitContainers = []v1.Container{}
@@ -290,6 +295,11 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			Name:      "hskp-agent",
 			MountPath: "/hskp/agent",
 		}
+		//更新的时候需要对当前的资源也进行处理，但是部分资源需要前后不一致，否则更新的时候无法生成patch path
+		if currentFlag {
+			volumeMount.Name = "hskp-agent-old"
+		}
+
 		//设置agentInitContainer
 		if podSpec.InitContainers == nil {
 			podSpec.InitContainers = []v1.Container{}

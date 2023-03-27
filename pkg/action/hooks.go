@@ -234,7 +234,7 @@ func doExecuteHook(cfg *Configuration,
 			customSelectorLabelOnChart := rl.GetCustomSelectorLabelOnChar(r.Mapping.GroupVersionKind.Kind, r.Name)
 			customLabelOnResource := rl.GetCustomLabelOnResource(r.Mapping.GroupVersionKind.Kind, r.Name)
 			commonLabelOnChart := rl.GetCommonLabelOnChart(r.Mapping.GroupVersionKind.Kind, r.Name)
-			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart)
+			err = action.AddLabel(imagePullSecret, clusterCode, r, commit, chartVersion, releaseName, chartName, agentVersion, namespace, false, nil, customLabelOnChart, customSelectorLabelOnChart, customLabelOnResource, commonLabelOnChart, false)
 			if err != nil {
 				return nil, err
 			}
