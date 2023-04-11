@@ -673,7 +673,7 @@ func resourceChartMapping(c *Configuration, hs []*release.Hook, manifests []rele
 	}
 	for i := range manifests {
 		childChartName := getChildChartName(manifests[i].Name)
-		if childChartName == "" || (semver.Compare(kubeVersion, "v1.22.0") >= 0 && manifests[i].Head.Kind == "Ingress") {
+		if childChartName == "" || manifests[i].Head.Metadata == nil || (semver.Compare(kubeVersion, "v1.22.0") >= 0 && manifests[i].Head.Kind == "Ingress") {
 			continue
 		}
 		resourceChartMap[fmt.Sprintf("%s:%s", manifests[i].Head.Kind, manifests[i].Head.Metadata.Name)] = childChartName
