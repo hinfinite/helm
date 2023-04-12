@@ -9,8 +9,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/kubernetes"
@@ -383,38 +381,6 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			handlerSpringBootMonitorMetrics()
 			handlerSvcLicense()
 		}
-		if isUpgrade {
-			if kind == "ReplicaSet" {
-				rs, err := clientSet.AppsV1().ReplicaSets(namespace).Get(t.GetName(), metav1.GetOptions{})
-				if errors.IsNotFound(err) {
-					break
-				}
-				if err != nil {
-					glog.Warningf("Failed to get ReplicaSet,error is %s.", err.Error())
-					return err
-				}
-				err = setReplicas(t.Object, int64(*rs.Spec.Replicas))
-				if err != nil {
-					glog.Warningf("Failed to set replicas,error is %s", err.Error())
-					return err
-				}
-			}
-			if kind == "Deployment" {
-				dp, err := clientSet.AppsV1().Deployments(namespace).Get(t.GetName(), metav1.GetOptions{})
-				if errors.IsNotFound(err) {
-					break
-				}
-				if err != nil {
-					glog.Warningf("Failed to get ReplicaSet,error is %s.", err.Error())
-					return err
-				}
-				err = setReplicas(t.Object, int64(*dp.Spec.Replicas))
-				if err != nil {
-					glog.Warningf("Failed to set replicas,error is %s", err.Error())
-					return err
-				}
-			}
-		}
 	case "Job":
 		addImagePullSecrets()
 		addTemplateAppLabels(kind, t.GetName())
@@ -424,23 +390,6 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	case "DaemonSet", "StatefulSet":
 		addImagePullSecrets()
 		addTemplateAppLabels(kind, t.GetName())
-		if isUpgrade {
-			if kind == "StatefulSet" {
-				sts, err := clientSet.AppsV1().StatefulSets(namespace).Get(t.GetName(), metav1.GetOptions{})
-				if errors.IsNotFound(err) {
-					break
-				}
-				if err != nil {
-					glog.Warningf("Failed to get ReplicaSet,error is %s.", err.Error())
-					return err
-				}
-				err = setReplicas(t.Object, int64(*sts.Spec.Replicas))
-				if err != nil {
-					glog.Warningf("Failed to set replicas,error is %s", err.Error())
-					return err
-				}
-			}
-		}
 	case "ConfigMap":
 	case "Service":
 	case "Ingress":
