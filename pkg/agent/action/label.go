@@ -397,9 +397,9 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	case "Pod":
 	default:
 	}
-	if t.GetNamespace() != "" && t.GetNamespace() != namespace {
-		return fmt.Errorf(" Kind:%s Name:%s. The namespace of this resource is not consistent with helm release", kind, t.GetName())
-	}
+	//if t.GetNamespace() != "" && t.GetNamespace() != namespace {
+	//	return fmt.Errorf(" Kind:%s Name:%s. The namespace of this resource is not consistent with helm release", kind, t.GetName())
+	//}
 
 	// Add base and app labels
 	l := t.GetLabels()
