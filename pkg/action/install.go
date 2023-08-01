@@ -113,7 +113,7 @@ type Install struct {
 	ChartVersion             string
 	ClusterCode              string
 	AgentVersion             string
-	DoCallbackReleaseHandler func(*release.Release)
+	DoCallbackReleaseHandler func(string, *release.Release)
 }
 
 // ChartPathOptions captures common options used for controlling chart paths
@@ -140,7 +140,7 @@ func NewInstall(cfg *Configuration,
 	chartVersion string,
 	clusterCode string,
 	agentVersion string,
-	doCallbackReleaseHandler func(*release.Release)) *Install {
+	doCallbackReleaseHandler func(string, *release.Release)) *Install {
 	return &Install{
 		ChartPathOptions:         chartPathOptions,
 		cfg:                      cfg,
@@ -324,8 +324,9 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 		return rel, nil
 	}
 
+	// 上报release下资源文件
 	if i.DoCallbackReleaseHandler != nil {
-		i.DoCallbackReleaseHandler(rel)
+		i.DoCallbackReleaseHandler(release.ResourceUploadCallBack, rel)
 	}
 
 	if i.CreateNamespace {
@@ -389,6 +390,11 @@ func (i *Install) Run(chrt *chart.Chart, vals map[string]interface{}, valsRaw st
 		if _, err := i.cfg.KubeClient.Update(toBeAdopted, resources, false); err != nil {
 			return i.failRelease(rel, err)
 		}
+	}
+
+	// 上报操作状态成功
+	if i.DoCallbackReleaseHandler != nil {
+		i.DoCallbackReleaseHandler(release.OperateStatusCallBack, rel)
 	}
 
 	if i.Wait {

@@ -77,13 +77,14 @@ type Upgrade struct {
 	PostRenderer             postrender.PostRenderer
 	DisableOpenAPIValidation bool
 
-	ReleaseName     string
-	Commit          string
-	ImagePullSecret []v1.LocalObjectReference
-	ChartName       string
-	ChartVersion    string
-	ClusterCode     string
-	AgentVersion    string
+	ReleaseName              string
+	Commit                   string
+	ImagePullSecret          []v1.LocalObjectReference
+	ChartName                string
+	ChartVersion             string
+	ClusterCode              string
+	AgentVersion             string
+	DoCallbackReleaseHandler func(string, *release.Release)
 }
 
 // NewUpgrade creates a new Upgrade object with the given configuration.
@@ -96,19 +97,21 @@ func NewUpgrade(cfg *Configuration,
 	chartVersion string,
 	clusterCode string,
 	agentVersion string,
-	reuseValues bool) *Upgrade {
+	reuseValues bool,
+	doCallbackReleaseHandler func(string, *release.Release)) *Upgrade {
 	return &Upgrade{
-		ChartPathOptions: chartPathOptions,
-		cfg:              cfg,
-		Commit:           commit,
-		ImagePullSecret:  imagePullSecret,
-		ReleaseName:      ReleaseName,
-		ChartName:        chartName,
-		ChartVersion:     chartVersion,
-		ClusterCode:      clusterCode,
-		AgentVersion:     agentVersion,
-		MaxHistory:       maxHistory,
-		ReuseValues:      reuseValues,
+		ChartPathOptions:         chartPathOptions,
+		cfg:                      cfg,
+		Commit:                   commit,
+		ImagePullSecret:          imagePullSecret,
+		ReleaseName:              ReleaseName,
+		ChartName:                chartName,
+		ChartVersion:             chartVersion,
+		ClusterCode:              clusterCode,
+		AgentVersion:             agentVersion,
+		MaxHistory:               maxHistory,
+		ReuseValues:              reuseValues,
+		DoCallbackReleaseHandler: doCallbackReleaseHandler,
 	}
 }
 
@@ -347,6 +350,11 @@ func (u *Upgrade) performUpgrade(originalRelease, upgradedRelease *release.Relea
 		if err := recreate(u.cfg, results.Updated); err != nil {
 			u.cfg.Log(err.Error())
 		}
+	}
+
+	// 上报操作状态成功
+	if u.DoCallbackReleaseHandler != nil {
+		u.DoCallbackReleaseHandler(release.OperateStatusCallBack, upgradedRelease)
 	}
 
 	if u.Wait {
