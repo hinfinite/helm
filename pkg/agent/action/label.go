@@ -267,6 +267,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	var handlerSvcLicense = func() {
 		svcLicenseeEnabled := hskpCommonLabelOnChart["hskp.io/svc_licensee_enabled"]
 		svcLicenseeLicUrl := hskpCommonLabelOnChart["hskp.io/svc_licensee_lic_url"]
+		svcLicenseeAgentUrl := hskpCommonLabelOnChart["hskp.io/svc_licensee_agent_url"]
 		if svcLicenseeEnabled != "true" {
 			return
 		}
@@ -316,6 +317,15 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			}
 			agentInitContainer.Env = append(agentInitContainer.Env, licenseeLicUrlEnv)
 		}
+		//设置agent下载路径
+		if svcLicenseeAgentUrl != "" {
+			licenseeAgentUrlEnv := v1.EnvVar{
+				Name:  "HSKP_DOWNLOAD_LICENSE_AGENT_URL",
+				Value: svcLicenseeAgentUrl,
+			}
+			agentInitContainer.Env = append(agentInitContainer.Env, licenseeAgentUrlEnv)
+		}
+
 		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
 		//给Containers设置挂载点。
 		var mountedVolumes []v1.VolumeMount
