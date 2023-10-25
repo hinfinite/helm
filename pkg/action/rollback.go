@@ -19,6 +19,8 @@ package action
 import (
 	"bytes"
 	"fmt"
+	"github.com/hinfinite/helm/pkg/agent/action"
+	v1 "k8s.io/api/core/v1"
 	"strings"
 	"time"
 
@@ -42,6 +44,12 @@ type Rollback struct {
 	Recreate      bool // will (if true) recreate pods after a rollback.
 	Force         bool // will (if true) force resource upgrade through uninstall/recreate if needed
 	CleanupOnFail bool
+
+	ReleaseName     string
+	Commit          string
+	ImagePullSecret []v1.LocalObjectReference
+	ClusterCode     string
+	AgentVersion    string
 }
 
 // NewRollback creates a new Rollback object with the given configuration.
@@ -130,6 +138,12 @@ func (r *Rollback) prepareRollback(name string) (*release.Release, *release.Rele
 		Version:  currentRelease.Version + 1,
 		Manifest: previousRelease.Manifest,
 		Hooks:    previousRelease.Hooks,
+
+		ResourceChartMap:            previousRelease.ResourceChartMap,
+		ChartCommonLabelMap:         previousRelease.ChartCommonLabelMap,
+		ChartCustomLabelMap:         previousRelease.ChartCustomLabelMap,
+		ChartCustomSelectorLabelMap: previousRelease.ChartCustomSelectorLabelMap,
+		ResourceCustomLabelMap:      previousRelease.ResourceCustomLabelMap,
 	}
 
 	return currentRelease, targetRelease, nil
@@ -148,6 +162,62 @@ func (r *Rollback) performRollback(currentRelease, targetRelease *release.Releas
 	target, err := r.cfg.KubeClient.Build(bytes.NewBufferString(targetRelease.Manifest), false)
 	if err != nil {
 		return targetRelease, errors.Wrap(err, "unable to build kubernetes objects from new release manifest")
+	}
+
+	// 如果是agent升级，则跳过添加标签这一步，因为agent原本是直接在集群中安装的没有对应标签，如果在这里加标签k8s会报错
+	if targetRelease.Chart.Name() != "hskp-devops-cluster-agent" {
+		// 在这里对要新chart包中的对象添加标签
+		// current于target相同的部分不会更新
+		for _, t := range target {
+			customLabelOnChart := targetRelease.GetCustomLabelOnChart(t.Mapping.GroupVersionKind.Kind, t.Name)
+			customSelectorLabelOnChart := targetRelease.GetCustomSelectorLabelOnChar(t.Mapping.GroupVersionKind.Kind, t.Name)
+			customLabelOnResource := targetRelease.GetCustomLabelOnResource(t.Mapping.GroupVersionKind.Kind, t.Name)
+			commonLabelOnChart := targetRelease.GetCommonLabelOnChart(t.Mapping.GroupVersionKind.Kind, t.Name)
+			err = action.AddLabel(r.ImagePullSecret,
+				r.ClusterCode,
+				t,
+				r.Commit,
+				targetRelease.Chart.Metadata.Version,
+				r.ReleaseName,
+				targetRelease.Chart.Metadata.Name,
+				r.AgentVersion,
+				currentRelease.Namespace,
+				true,
+				r.cfg.ClientSet,
+				customLabelOnChart,
+				customSelectorLabelOnChart,
+				customLabelOnResource,
+				commonLabelOnChart,
+				false)
+			if err != nil {
+				return nil, err
+			}
+		}
+		for _, c := range current {
+			customLabelOnChart := currentRelease.GetCustomLabelOnChart(c.Mapping.GroupVersionKind.Kind, c.Name)
+			customSelectorLabelOnChart := currentRelease.GetCustomSelectorLabelOnChar(c.Mapping.GroupVersionKind.Kind, c.Name)
+			customLabelOnResource := currentRelease.GetCustomLabelOnResource(c.Mapping.GroupVersionKind.Kind, c.Name)
+			commonLabelOnChart := currentRelease.GetCommonLabelOnChart(c.Mapping.GroupVersionKind.Kind, c.Name)
+			err = action.AddLabel(r.ImagePullSecret,
+				r.ClusterCode,
+				c,
+				"",
+				currentRelease.Chart.Metadata.Version,
+				r.ReleaseName,
+				currentRelease.Chart.Metadata.Name,
+				r.AgentVersion,
+				currentRelease.Namespace,
+				true,
+				r.cfg.ClientSet,
+				customLabelOnChart,
+				customSelectorLabelOnChart,
+				customLabelOnResource,
+				commonLabelOnChart,
+				true)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	// pre-rollback hooks
