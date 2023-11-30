@@ -205,7 +205,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			Name:            "hskp-java-agent",
 			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.1.0",
 			Command:         []string{"sh", "-c", "cp /data/agents/opentelemetry-* /hskp/agent"},
-			ImagePullPolicy: v1.PullPolicy("Always"),
+			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
 		}
 		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
@@ -308,7 +308,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			Name:            "hskp-license-agent",
 			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.1.0",
 			Command:         []string{"sh", "-c", "bash /data/agents/download_license.sh && /bin/cp -rf /data/agents/* /hskp/agent"},
-			ImagePullPolicy: v1.PullPolicy("Always"),
+			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
 		}
 		//设置lic文件下载路径
