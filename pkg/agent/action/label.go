@@ -203,7 +203,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		agentInitContainer := v1.Container{
 			Name:            "hskp-java-agent",
-			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.1.0",
+			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.2.0",
 			Command:         []string{"sh", "-c", "cp /data/agents/opentelemetry-* /hskp/agent"},
 			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
@@ -306,7 +306,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		agentInitContainer := v1.Container{
 			Name:            "hskp-license-agent",
-			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.1.0",
+			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.2.0",
 			Command:         []string{"sh", "-c", "bash /data/agents/download_license.sh && /bin/cp -rf /data/agents/* /hskp/agent"},
 			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
