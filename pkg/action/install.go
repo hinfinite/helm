@@ -691,7 +691,7 @@ func getChildChartName(path string) string {
 	if pathParts == nil || len(pathParts) < 2 {
 		return ""
 	}
-	if pathParts[1] == "charts" {
+	if pathParts[0] == "hskp-devops" && pathParts[1] == "charts" {
 		return pathParts[2]
 	}
 	return pathParts[0]
