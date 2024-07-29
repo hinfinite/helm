@@ -43,7 +43,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		labels[model.AgentVersionLabel] = agentVersion
 		labels[model.ReleaseLabel] = releaseName
 		labels[model.CommitLabel] = commit
-		labels[model.LastUpdateTime] = time.Now().String()
+		labels[model.LastUpdateTime] = time.Now().Format("2006-01-02-15-04-05")
 
 	}
 	var addAppLabels = func(labels map[string]string) {
