@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
@@ -42,6 +43,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		labels[model.AgentVersionLabel] = agentVersion
 		labels[model.ReleaseLabel] = releaseName
 		labels[model.CommitLabel] = commit
+		labels[model.LastUpdateTime] = time.Now().String()
 
 	}
 	var addAppLabels = func(labels map[string]string) {
