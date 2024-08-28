@@ -50,6 +50,8 @@ type Rollback struct {
 	ImagePullSecret []v1.LocalObjectReference
 	ClusterCode     string
 	AgentVersion    string
+	ChartName       string
+	ChartVersion    string
 }
 
 // NewRollback creates a new Rollback object with the given configuration.
