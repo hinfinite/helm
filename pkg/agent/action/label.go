@@ -15,6 +15,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+var defaultJavaAgentImage = "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.2.0"
+
 func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	clusterCode string,
 	info *resource.Info,
@@ -154,6 +156,10 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 	var handlerSpringBootMonitorMetrics = func() {
 		metricsEnabled := customLabelOnChart["hskp.io/spring_boot_metrics_enabled"]
 		traceEnabled := customLabelOnChart["hskp.io/spring_boot_trace_enabled"]
+		hskpJavaAgentImage := hskpCommonLabelOnChart["hskp.io/hskp_java_agent_image"]
+		if hskpJavaAgentImage == "" {
+			hskpJavaAgentImage = defaultJavaAgentImage
+		}
 		if metricsEnabled != "true" && traceEnabled != "true" {
 			return
 		}
@@ -205,7 +211,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		agentInitContainer := v1.Container{
 			Name:            "hskp-java-agent",
-			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.2.0",
+			Image:           hskpJavaAgentImage,
 			Command:         []string{"sh", "-c", "cp /data/agents/opentelemetry-* /hskp/agent"},
 			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
@@ -271,6 +277,10 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		svcLicenseeEnabled := hskpCommonLabelOnChart["hskp.io/svc_licensee_enabled"]
 		svcLicenseeLicUrl := hskpCommonLabelOnChart["hskp.io/svc_licensee_lic_url"]
 		svcLicenseeAgentUrl := hskpCommonLabelOnChart["hskp.io/svc_licensee_agent_url"]
+		hskpJavaAgentImage := hskpCommonLabelOnChart["hskp.io/hskp_java_agent_image"]
+		if hskpJavaAgentImage == "" {
+			hskpJavaAgentImage = defaultJavaAgentImage
+		}
 		if svcLicenseeEnabled != "true" {
 			return
 		}
@@ -308,7 +318,7 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 		}
 		agentInitContainer := v1.Container{
 			Name:            "hskp-license-agent",
-			Image:           "harbor.open.hand-china.com/hskp/hskp-javaagent:v1.2.0",
+			Image:           hskpJavaAgentImage,
 			Command:         []string{"sh", "-c", "bash /data/agents/download_license.sh && /bin/cp -rf /data/agents/* /hskp/agent"},
 			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
