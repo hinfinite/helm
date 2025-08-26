@@ -10,6 +10,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/hinfinite/helm/pkg/agent/model"
 	v1 "k8s.io/api/core/v1"
+	v1_res "k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/kubernetes"
@@ -215,6 +216,16 @@ func AddLabel(imagePullSecret []v1.LocalObjectReference,
 			Command:         []string{"sh", "-c", "cp /data/agents/opentelemetry-* /hskp/agent"},
 			ImagePullPolicy: v1.PullPolicy("IfNotPresent"),
 			VolumeMounts:    []v1.VolumeMount{volumeMount},
+			Resources: v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					v1.ResourceCPU:    v1_res.MustParse("500m"),
+					v1.ResourceMemory: v1_res.MustParse("512M"),
+				},
+				Requests: v1.ResourceList{
+					v1.ResourceCPU:    v1_res.MustParse("250m"),
+					v1.ResourceMemory: v1_res.MustParse("256M"),
+				},
+			},
 		}
 		podSpec.InitContainers = append(podSpec.InitContainers, agentInitContainer)
 		//给Containers设置挂载点
